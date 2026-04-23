@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoleMap — あなたの役割を見つける</title>
+<meta name="description" content="人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。">
+<!-- OGP -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rolemap.jp/">
+<meta property="og:title" content="RoleMap — あなたの役割を見つける">
+<meta property="og:description" content="人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。">
+<meta property="og:image" content="https://rolemap.jp/ogp.png">
+<meta property="og:site_name" content="RoleMap">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RoleMap — あなたの役割を見つける">
+<meta name="twitter:description" content="人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。">
+<meta name="twitter:image" content="https://rolemap.jp/ogp.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05050f;
+    --surface: #0d0d1e;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8e8f0;
+    --muted: rgba(255,255,255,0.7);
+    --glow: rgba(100,120,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #05050f; color-scheme: dark; }
+
+  body {
+    background: #05050f;
+    overflow-x: hidden;
+    color: #e8e8f0;
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 0;
+    opacity: 0.6;
+    transition: background 1.5s ease, transform 1.5s ease;
+  }
+  .orb1 { width: 200px; height: 200px; top: -80px; left: -60px; background: radial-gradient(circle, #1a2566, transparent 70%); z-index: 0; }
+  .orb2 { width: 180px; height: 180px; bottom: -60px; right: -60px; background: radial-gradient(circle, #6b0a10, transparent 70%); z-index: 0; }
+
+  /* ───── SCREENS ───── */
+  .screen {
+    position: relative;
+    z-index: 1;
+    display: none;
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: #05050f;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+
+  /* ───── INTRO ───── */
+  #intro {
+    text-align: center;
+    gap: 0;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 48px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .logo-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    font-size: clamp(52px, 11vw, 100px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.5) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .tagline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(12px, 2vw, 16px);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 28px;
+  }
+
+  .intro-desc {
+    max-width: 480px;
+    font-size: 14px;
+    line-height: 2;
+    color: rgba(255,255,255,0.95);
+    margin-bottom: 40px;
+  }
+
+  .intro-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .intro-share-icons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .intro-share-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.03);
+    color: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .intro-share-btn:hover {
+    background: rgba(0,0,0,0.08);
+    color: rgba(0,0,0,0.7);
+  }
+
+  .intro-contact {
+    font-size: 12px;
+    color: rgba(0,0,0,0.35);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .intro-contact:hover {
+    color: rgba(0,0,0,0.6);
+  }
+
+  .intro-copyright {
+    font-size: 11px;
+    color: rgba(0,0,0,0.25);
+    letter-spacing: 0.08em;
+  }
+    width: 100%;
+    margin-bottom: 48px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .intro-accordion-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 14px 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: rgba(0,0,0,0.45);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .intro-accordion-icon {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+  }
+
+  .intro-accordion-btn.open .intro-accordion-icon {
+    transform: rotate(180deg);
+  }
+
+  .intro-accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .intro-accordion-body p {
+    font-size: 13px;
+    line-height: 2;
+    color: rgba(0,0,0,0.4);
+    padding-top: 12px;
+    padding-bottom: 16px;
+    text-align: left;
+  }
+
+  .intro-accordion-btn,
+  .intro-accordion-btn:link,
+  .intro-accordion-btn:visited {
+    color: rgba(0,0,0,0.5) !important;
+  }
+  .intro-features {
+    list-style: none;
+    margin-top: 40px;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+    max-width: 360px;
+  }
+
+  .intro-features li {
+    font-size: 14px;
+    color: rgba(0,0,0,0.45);
+    font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 0.03em;
+    line-height: 1.6;
+  }
+
+  .start-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #4a6cf7 0%, #C2185B 40%, #F57C00 70%, #00ACC1 100%);
+    background-size: 200% 200%;
+    animation: btnGradient 4s ease infinite;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 28px rgba(194,24,91,0.35);
+    padding: 20px 56px;
+  }
+
+  @keyframes btnGradient {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .start-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 1;
+  }
+
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(194,24,91,0.45); }
+
+  /* ===== キリ番カウンター ===== */
+  .visitor-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+    margin-bottom: 28px;
+  }
+
+  /* ぴょんぴょんうさぎ */
+  .counter-mascot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .counter-mascot-body {
+    width: 16px;
+    height: 20px;
+    position: relative;
+    image-rendering: pixelated;
+  }
+
+  /* うさぎ本体（SVGで描く） */
+  .counter-mascot-body svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .counter-mascot-shadow {
+    width: 10px;
+    height: 3px;
+    background: rgba(74,74,90,0.15);
+    border-radius: 50%;
+  }
+
+  /* 左キャラ：少し遅れてぴょん */
+  .counter-mascot.left .counter-mascot-body {
+    animation: mascotBounce 0.9s ease-in-out infinite;
+  }
+  .counter-mascot.left .counter-mascot-shadow {
+    animation: shadowScale 0.9s ease-in-out infinite;
+  }
+
+  /* 右キャラ：逆位相でぴょん */
+  .counter-mascot.right .counter-mascot-body {
+    animation: mascotBounce 0.9s ease-in-out infinite 0.45s;
+  }
+  .counter-mascot.right .counter-mascot-shadow {
+    animation: shadowScale 0.9s ease-in-out infinite 0.45s;
+  }
+
+  @keyframes mascotBounce {
+    0%, 100% { transform: translateY(0);    }
+    40%       { transform: translateY(-7px); }
+    60%       { transform: translateY(-5px); }
+  }
+  @keyframes shadowScale {
+    0%, 100% { transform: scaleX(1);    opacity: 0.5; }
+    40%       { transform: scaleX(0.5); opacity: 0.2; }
+    60%       { transform: scaleX(0.6); opacity: 0.25; }
+  }
+
+  /* 数字列 */
+  .counter-digits {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .counter-digit {
+    width: 22px;
+    height: 30px;
+    border: 1px solid rgba(74,74,90,0.25);
+    border-radius: 4px;
+    background: rgba(74,74,90,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a4a5a;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .counter-comma {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: rgba(74,74,90,0.35);
+    width: 6px;
+    text-align: center;
+    padding-bottom: 4px;
+  }
+
+  .counter-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(74,74,90,0.45);
+    margin-left: 2px;
+    white-space: nowrap;
+    align-self: flex-end;
+    padding-bottom: 3px;
+  }
+
+  .intro-type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto 32px;
+  }
+
+  .type-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.03);
+    font-size: 11px;
+    color: rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .type-chip:hover {
+    background: rgba(0,0,0,0.07);
+  }
+
+  .type-chip .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ───── TIEBREAKER ───── */
+  #tiebreaker {
+    gap: 32px;
+    padding: 60px 24px;
+  }
+
+  .tb-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tb-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Space Grotesk', sans-serif;
+    text-transform: uppercase;
+  }
+
+  .tb-counter-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .tb-question {
+    font-size: clamp(16px, 4vw, 22px);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  .tb-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .tb-option-btn {
+    width: 100%;
+    padding: 18px 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    text-align: left;
+    cursor: pointer;
+    line-height: 1.6;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .tb-option-btn:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  /* ───── QUIZ ───── */
+  #quiz {
+    gap: 0;
+    padding: 60px 20px;
+  }
+
+  .quiz-header {
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .q-counter {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22d3ee);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(74,222,128,0.5);
+  }
+
+  .question-card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.2s ease;
+  }
+
+  .question-card.fade-out {
+    opacity: 0;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .q-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .q-text {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    color: #fff;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    transform: translateX(4px);
+  }
+
+  .option-label {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .option-btn:hover .option-label {
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .option-btn.selected {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .option-btn.selected .option-label {
+    background: #fff;
+    color: #05050f;
+    border-color: #fff;
+  }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 640px;
+    margin-top: 24px;
+  }
+
+  .nav-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+  .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+  .nav-btn.primary {
+    background: linear-gradient(135deg, #E8362A, #C1121F);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(232,54,42,0.4);
+  }
+
+  .nav-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,54,42,0.55); }
+  .nav-btn.primary:disabled { opacity: 0.3; transform: none; box-shadow: none; }
+
+  /* ───── RESULT ───── */
+  #result {
+    gap: 0;
+    text-align: center;
+    padding: 60px 20px 80px;
+  }
+
+  .result-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  /* result initial big letter */
+  .result-initial-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: scaleIn 0.8s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .result-initial {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(100px, 22vw, 180px);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    color: var(--type-color, #fff);
+    text-shadow: 0 0 80px var(--type-color, rgba(255,255,255,0.3));
+  }
+
+  .result-animal-small {
+    font-size: clamp(48px, 10vw, 72px);
+    line-height: 1;
+    filter: drop-shadow(0 0 20px var(--type-color, rgba(100,120,255,0.4)));
+  }
+
+  .result-type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.55s forwards;
+  }
+
+  .result-type {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(22px, 5vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  .result-subtitle {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(12px, 3vw, 15px);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .result-card {
+    width: 100%;
+    max-width: 580px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: left;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 透かし文字 */
+  .result-card::after {
+    content: attr(data-animal);
+    position: absolute;
+    bottom: -10px;
+    right: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(52px, 13vw, 80px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--type-color, #fff);
+    opacity: 0.07;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--type-color, #fff), transparent);
+  }
+
+  .result-desc {
+    font-size: 14px;
+    line-height: 2.1;
+    color: rgba(255,255,255,0.7);
+    white-space: pre-wrap;
+    text-align: left;
+  }
+
+  .desc-heading {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    margin-top: 40px;
+    margin-bottom: 2px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--type-color, rgba(255,255,255,0.2));
+  }
+
+  .scores-section {
+    width: 100%;
+    max-width: 580px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1s forwards;
+  }
+
+  .scores-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .score-animal { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+  .score-name { font-family: 'Space Grotesk', sans-serif; font-size: 12px; color: var(--muted); width: 90px; flex-shrink: 0; }
+
+  .score-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+  .score-val { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--muted); width: 30px; text-align: right; flex-shrink: 0; }
+
+  .survey-btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .survey-btn.selected {
+    background: var(--type-color, rgba(255,255,255,0.2));
+    border-color: var(--type-color, rgba(255,255,255,0.4));
+    color: #fff;
+  }
+
+  /* キリ番ポップアップ */
+  .kiriban-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(10,10,20,0.97);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 0 40px rgba(100,120,255,0.3);
+    max-width: 280px;
+    width: 90%;
+  }
+  .kiriban-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+  }
+  .kiriban-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .kiriban-msg {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .kiriban-close {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 8px 24px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+  }
+  .kiriban-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .kiriban-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .retry-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 40px;
+    transition: all 0.2s;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.2s forwards;
+  }
+
+  .retry-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+
+
+
+  /* ───── CYCLE MAP ───── */
+  .cycle-section {
+    width: calc(100% + 40px);
+    max-width: 600px;
+    margin-top: 40px;
+    margin-left: -20px;
+    margin-right: -20px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.9s forwards;
+    align-self: center;
+  }
+  .cycle-section-title,
+  .cycle-subtitle {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+
+
+  .cycle-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  .cycle-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.6;
+  }
+
+  .cycle-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+  }
+
+  .cycle-wrap svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  .cycle-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+
+  .cycle-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+
+  /* ───── BATON ───── */
+  .baton-section {
+    width: 100%;
+    max-width: 580px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.0s forwards;
+    text-align: left;
+  }
+
+  .baton-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .baton-intro {
+    font-size: 13px;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+  }
+
+  .baton-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .baton-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .baton-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--baton-color, rgba(255,255,255,0.2));
+  }
+
+  .baton-animal {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .baton-info { flex: 1; }
+
+  .baton-type-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .baton-phase {
+    font-size: 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .baton-desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ───── AI PROMPTS ───── */
+  .prompt-section {
+    width: 100%;
+    max-width: 580px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.15s forwards;
+  }
+
+  .prompt-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  .prompt-intro {
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .prompt-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--type-color, #fff), transparent);
+    opacity: 0.5;
+  }
+
+  .prompt-card-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--type-color, rgba(255,255,255,0.5));
+    margin-bottom: 12px;
+  }
+
+  .prompt-text {
+    font-size: 13px;
+    line-height: 1.85;
+    color: rgba(255,255,255,0.75);
+    font-family: 'Noto Sans JP', sans-serif;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .prompt-copy-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+  .prompt-copy-btn.done { color: #4ade80; border-color: #4ade80; }
+
+  /* ───── SHARE ───── */
+  .share-section {
+    width: 100%;
+    max-width: 580px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.1s forwards;
+  }
+
+  .share-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  /* シェアカード（canvas描画用の見た目） */
+  .share-card-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+
+  #shareCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .share-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .share-btn {
+    flex: 1;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 13px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+
+  .share-btn.x-share {
+    background: var(--type-color, #4a6cf7);
+    color: #fff;
+    border-color: transparent;
+    gap: 8px;
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--type-color, #4a6cf7) 40%, transparent);
+  }
+  .share-btn.x-share:hover { transform: translateY(-2px); filter: brightness(1.15); }
+
+  .share-btn.threads-share {
+    background: var(--surface);
+    color: #fff;
+    border-color: var(--border);
+    gap: 8px;
+  }
+  .share-btn.threads-share:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.3); }
+
+  .share-btn.copy {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid var(--border);
+  }
+  .share-btn.copy:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+  .share-btn.copy.done { color: #4ade80; border-color: #4ade80; }
+
+  .share-btn.facebook-share {
+    background: #1877F2;
+    color: #fff;
+    border-color: transparent;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(24,119,242,0.35);
+  }
+  .share-btn.facebook-share:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+  .share-btn.download {
+    background: #fff;
+    color: #05050f;
+    border: 1px solid #fff;
+  }
+  .share-btn.download:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,0.15); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .fade-enter { animation: fadeUp 0.4s forwards; }
+
+  /* ───── INTRO LIGHT OVERRIDE ───── */
+  #intro {
+    text-align: center;
+    gap: 0;
+    background: #f0efe9;
+  }
+
+  #intro .logo-badge {
+    color: rgba(10,10,20,0.5);
+    border-color: rgba(10,10,20,0.15);
+    background: rgba(10,10,20,0.05);
+  }
+
+  #intro h1 {
+    -webkit-text-fill-color: #4a4a5a;
+  }
+
+  #intro .tagline {
+    color: rgba(10,10,20,0.55);
+  }
+
+  #intro .intro-desc {
+    color: rgba(10,10,20,0.75);
+  }
+
+  #intro .type-chip {
+    color: rgba(10,10,20,0.65);
+    border-color: rgba(10,10,20,0.15);
+    background: rgba(10,10,20,0.05);
+  }
+
+
+  /* intro中はorbを非表示 */
+  body:has(#intro.active) .orb {
+    opacity: 0 !important;
+  }
+
+  img.emoji { height: 1em; width: 1em; margin: 0 0.05em 0 0.1em; vertical-align: -0.1em; }
+  .result-animal-small img.emoji { height: 1.2em; width: 1.2em; }
+  #shareEmoji img.emoji { height: 0.9em; width: 0.9em; }
+</style>
+</head>
+<body>
+
+<div class="kiriban-overlay" id="kiribanOverlay" onclick="closeKiriban()"></div>
+<div class="kiriban-popup" id="kiribanPopup">
+  <div class="kiriban-num" id="kiribanNum"></div>
+  <div class="kiriban-msg" id="kiribanMsg"></div>
+  <button class="kiriban-close" onclick="closeKiriban()">とじる</button>
+</div>
+
+<div class="orb orb1" id="orb1"></div>
+<div class="orb orb2" id="orb2"></div>
+
+<!-- ===== INTRO ===== -->
+<div class="screen active" id="intro">
+  <div class="logo-badge">RoleMap Diagnostic v0.1</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0;">
+    <img src="data:image/webp;base64,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" width="80" height="80" style="display:block;position:relative;top:-5px;" alt="RoleMap Logo">
+    <h1>RoleMap</h1>
+  </div>
+  <p class="tagline">あなたの役割を見つける</p>
+  <!-- キリ番カウンター -->
+  <div class="visitor-counter">
+    <!-- 左うさぎ -->
+    <div class="counter-mascot left">
+      <div class="counter-mascot-body">
+        <svg viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="4" fill="#4a4a5a"/>
+          <rect x="7" y="0" width="2" height="4" fill="#4a4a5a"/>
+          <rect x="2" y="1" width="1" height="2" fill="rgba(74,74,90,0.3)"/>
+          <rect x="7" y="1" width="1" height="2" fill="rgba(74,74,90,0.3)"/>
+          <rect x="1" y="3" width="8" height="8" rx="2" fill="#4a4a5a" fill-opacity="0.15"/>
+          <rect x="1" y="3" width="8" height="8" rx="2" stroke="#4a4a5a" stroke-width="0.8"/>
+          <rect x="3" y="6" width="1" height="1" fill="#4a4a5a"/>
+          <rect x="6" y="6" width="1" height="1" fill="#4a4a5a"/>
+          <rect x="4" y="8" width="2" height="1" fill="#4a4a5a" fill-opacity="0.5"/>
+          <rect x="2" y="11" width="2" height="2" rx="1" fill="#4a4a5a"/>
+          <rect x="6" y="11" width="2" height="2" rx="1" fill="#4a4a5a"/>
+        </svg>
+      </div>
+      <div class="counter-mascot-shadow"></div>
+    </div>
+    <!-- 数字＋ラベル -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+      <div class="counter-digits" id="visitorDigits"></div>
+      <span class="counter-label" style="text-align:center;width:100%;">visitors</span>
+    </div>
+    <!-- 右うさぎ -->
+    <div class="counter-mascot right">
+      <div class="counter-mascot-body">
+        <svg viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="4" fill="#4a4a5a"/>
+          <rect x="7" y="0" width="2" height="4" fill="#4a4a5a"/>
+          <rect x="2" y="1" width="1" height="2" fill="rgba(74,74,90,0.3)"/>
+          <rect x="7" y="1" width="1" height="2" fill="rgba(74,74,90,0.3)"/>
+          <rect x="1" y="3" width="8" height="8" rx="2" fill="#4a4a5a" fill-opacity="0.15"/>
+          <rect x="1" y="3" width="8" height="8" rx="2" stroke="#4a4a5a" stroke-width="0.8"/>
+          <rect x="3" y="6" width="1" height="1" fill="#4a4a5a"/>
+          <rect x="6" y="6" width="1" height="1" fill="#4a4a5a"/>
+          <rect x="4" y="8" width="2" height="1" fill="#4a4a5a" fill-opacity="0.5"/>
+          <rect x="2" y="11" width="2" height="2" rx="1" fill="#4a4a5a"/>
+          <rect x="6" y="11" width="2" height="2" rx="1" fill="#4a4a5a"/>
+        </svg>
+      </div>
+      <div class="counter-mascot-shadow"></div>
+    </div>
+  </div>
+  <p class="intro-desc">
+    人は優劣ではなく、役割でできている。
+  </p>
+
+  <button class="start-btn" onclick="startQuiz()">役割をみつける <span style="font-size:1.4em;line-height:1;position:relative;top:-0.02em;">»</span></button>
+
+  <ul class="intro-features">
+    <li>✦ 約5分で診断完了（全32問）</li>
+    <li>✦ 8つの役割タイプからあなたを判定</li>
+    <li>✦ AIプロンプトでそのまま活用できる</li>
+  </ul>
+
+  <p style="font-size:11px;color:rgba(0,0,0,0.3);letter-spacing:0.15em;margin-bottom:10px;">— 8 ROLE TYPES —</p>
+  <div class="intro-type-grid" id="typePreview"></div>
+
+  <div class="intro-accordion">
+    <button class="intro-accordion-btn" onclick="toggleAccordion(this)" style="color:rgba(0,0,0,0.35)!important;background:transparent!important;border:none!important;outline:none!important;">
+      <span>RoleMapについて</span>
+      <span class="intro-accordion-icon">▼</span>
+    </button>
+    <div class="intro-accordion-body">
+      <p style="text-align:center;">
+        人には、それぞれ違う役割があります。<br><br>
+        途中で飽きてしまうこと。<br>
+        人と同じようにできないこと。<br><br>
+        それは、あなたのせいではありません。<br><br>
+        世界は一人で動かない。<br>
+        人は優劣ではなく、役割でできている。<br><br>
+        人は揺れます。<br>でも揺れの中にも、<br>繰り返される軸があります。<br>
+        それが、あなたの役割です。
+      </p>
+    </div>
+  </div>
+
+  <div class="intro-footer">
+    <div class="intro-share-icons">
+      <button class="intro-share-btn" onclick="introShareX()" title="Xでシェア">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </button>
+      <button class="intro-share-btn" onclick="introShareThreads()" title="Threadsでシェア">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.378-.888h-.048c-.817 0-1.83.213-2.589 1.43l-1.745-1.075C8.173 5.394 9.752 4.514 11.986 4.5h.069c3.509.026 5.59 2.187 5.763 5.952.085.059.169.12.25.183 1.149.862 1.939 2.054 2.286 3.45.456 1.832.266 4.315-1.865 6.396-1.865 1.818-4.152 2.495-7.304 2.519h-.006z"/><path d="M12.47 9.736c-.23-.007-.464-.007-.696.003-1.028.059-1.862.36-2.363.845-.434.418-.637.967-.604 1.584.033.606.315 1.107.797 1.415.556.359 1.31.527 2.234.476 1.086-.059 1.878-.44 2.354-1.132.35-.508.536-1.175.575-2.042a11.906 11.906 0 0 0-2.297-.149z"/></svg>
+      </button>
+      <button class="intro-share-btn" onclick="introShareFacebook()" title="Facebookでシェア">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </button>
+      <button class="intro-share-btn" onclick="introShareLine()" title="LINEでシェア">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      </button>
+      <button class="intro-share-btn" onclick="introShareCopy()" title="URLをコピー" id="introCopyBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+    <a class="intro-contact" href="mailto:rolemap.8types@gmail.com">お問い合わせ</a>
+    <p class="intro-copyright">© 2026 RoleMap Project</p>
+  </div>
+</div>
+
+<!-- ===== TIEBREAKER ===== -->
+<div class="screen" id="tiebreaker">
+  <div class="tb-header">
+    <p class="tb-label">もう少し絞り込みます</p>
+    <p class="tb-counter-text">追加質問 <span id="tbCounter">1 / 3</span></p>
+  </div>
+  <p class="tb-question" id="tbQuestion"></p>
+  <div class="tb-options" id="tbOptions"></div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="screen" id="quiz">
+  <div class="quiz-header">
+    <div class="progress-row">
+      <span class="q-counter" id="qCounter">Q 01 / 24</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-number" id="qNumber">Question 01</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div class="quiz-nav">
+    <button class="nav-btn" id="prevBtn" onclick="prevQ()" disabled>← 戻る</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQ()" style="display:none">結果を見る →</button>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div class="screen" id="result">
+  <div class="result-label">Your RoleMap Type</div>
+  <div class="result-initial-row">
+    <div class="result-initial" id="rInitial"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <div class="result-animal-small" id="rAnimal"></div>
+      <span id="rAnimalName" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:0.15em;color:var(--type-color,#fff);opacity:0.75;"></span>
+    </div>
+  </div>
+  <div class="result-type-row">
+    <span class="result-subtitle" id="rSubtitle"></span>
+    <span class="result-type" id="rType"></span>
+  </div>
+  <p id="rCatchcopy" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(15px,3.5vw,20px);color:rgba(255,255,255,0.85);font-weight:500;text-align:center;line-height:1.7;margin-bottom:32px;opacity:0;animation:fadeUp 0.6s 0.65s forwards;"></p>
+
+  <div class="share-section">
+    <div class="share-title">シェアする</div>
+    <div class="share-card-wrap">
+      <div id="shareCardHtml" style="background:#05050f;border-radius:12px;overflow:hidden;width:100%;aspect-ratio:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 24px;box-sizing:border-box;">
+        <!-- グリッド背景 -->
+        <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;"></div>
+        <!-- グロー -->
+        <div id="shareCardGlow" style="position:absolute;width:60%;height:60%;top:10%;border-radius:50%;filter:blur(60px);opacity:0.3;pointer-events:none;"></div>
+        <!-- コンテンツ -->
+        <p style="font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:0.25em;color:rgba(255,255,255,0.3);position:relative;">ROLEMAP</p>
+        <div style="position:relative;width:45%;aspect-ratio:1;"><img id="shareCardIcon" src="" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;"></div>
+        <p id="shareCardInitial" style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.1em;position:relative;"></p>
+        <p id="shareCardName" style="font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,8vw,48px);font-weight:800;color:#fff;letter-spacing:-0.02em;position:relative;line-height:1;"></p>
+        <p id="shareCardSubtitle" style="font-family:'Noto Sans JP',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);position:relative;"></p>
+        <p id="shareCardCatchcopy" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(12px,3.5vw,16px);color:rgba(255,255,255,0.8);font-weight:500;position:relative;text-align:center;line-height:1.7;"></p>
+        <p style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);position:relative;letter-spacing:0.1em;margin-top:8px;">rolemap.jp</p>
+      </div>
+      <canvas id="shareCanvas" width="1080" height="1080" style="display:none;"></canvas>
+      <img id="shareCardImg" style="width:100%;display:none;border-radius:12px;" alt="シェアカード">
+    </div>
+    <div class="share-btns">
+      <button class="share-btn x-share" onclick="shareToX()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <span>X</span>
+      </button>
+      <button class="share-btn threads-share" onclick="shareToThreads()">
+        <span>Threads</span>
+      </button>
+      <button class="share-btn facebook-share" onclick="shareToFacebook()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        <span>Facebook</span>
+      </button>
+    </div>
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px;letter-spacing:0.05em;">画像を長押しでカメラロールに保存できます</p>
+  </div>
+
+  <div class="result-card">
+    <div class="result-desc" id="rDesc"></div>
+  </div>
+
+  <div class="cycle-section">
+    <div class="cycle-section-title">プロジェクトサイクルマップ</div>
+    <p class="cycle-subtitle" id="cycleSubtitle"></p>
+    <div class="cycle-wrap">
+      <svg id="cycleSvg" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="scores-section">
+    <div class="scores-title">全タイプのスコア分布</div>
+    <div id="scoresBars"></div>
+  </div>
+  <div class="baton-section">
+    <div class="baton-section-title">バトンを渡せる相手</div>
+    <p class="baton-intro" id="batonIntro"></p>
+    <div class="baton-cards" id="batonCards"></div>
+  </div>
+  <div class="prompt-section">
+    <div class="prompt-section-title">AI と一人でチームを組む</div>
+    <p class="prompt-intro" id="promptIntro"></p>
+    <div class="prompt-card" id="promptCard1">
+      <div class="prompt-card-label">🔋 モチベーション維持プロンプト</div>
+      <div class="prompt-text" id="promptText1"></div>
+      <button class="prompt-copy-btn" onclick="copyPrompt(1)">📋 コピー</button>
+    </div>
+    <div class="prompt-card" id="promptCard2">
+      <div class="prompt-card-label">🤝 チーム役割補完プロンプト</div>
+      <div class="prompt-text" id="promptText2"></div>
+      <button class="prompt-copy-btn" onclick="copyPrompt(2)">📋 コピー</button>
+    </div>
+  </div>
+  <button class="retry-btn" onclick="restart()">もう一度診断する</button>
+  <button class="retry-btn" onclick="shareToX()" style="margin-top:12px;border-color:var(--type-color);color:var(--type-color);">友達に診断してもらう »</button>
+
+  <!-- アンケート -->
+  <div id="surveyForm" style="width:100%;max-width:580px;margin-top:40px;padding:24px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-align:center;">
+    <p style="font-size:11px;letter-spacing:0.2em;color:rgba(255,255,255,0.35);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;margin-bottom:16px;">任意アンケート</p>
+    <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;line-height:1.7;">データ収集にご協力いただけると嬉しいです。<br>回答は任意です。</p>
+
+    <input type="hidden" id="surveyAgeGroup" value="">
+    <input type="hidden" id="surveyGender" value="">
+
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">年代</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">
+      <button class="survey-btn" data-group="age" data-val="10代" onclick="selectSurvey(this,'age','surveyAgeGroup')">10代</button>
+      <button class="survey-btn" data-group="age" data-val="20代" onclick="selectSurvey(this,'age','surveyAgeGroup')">20代</button>
+      <button class="survey-btn" data-group="age" data-val="30代" onclick="selectSurvey(this,'age','surveyAgeGroup')">30代</button>
+      <button class="survey-btn" data-group="age" data-val="40代" onclick="selectSurvey(this,'age','surveyAgeGroup')">40代</button>
+      <button class="survey-btn" data-group="age" data-val="50代以上" onclick="selectSurvey(this,'age','surveyAgeGroup')">50代以上</button>
+    </div>
+
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">性別</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
+      <button class="survey-btn" data-group="gender" data-val="男性" onclick="selectSurvey(this,'gender','surveyGender')">男性</button>
+      <button class="survey-btn" data-group="gender" data-val="女性" onclick="selectSurvey(this,'gender','surveyGender')">女性</button>
+      <button class="survey-btn" data-group="gender" data-val="その他" onclick="selectSurvey(this,'gender','surveyGender')">その他</button>
+      <button class="survey-btn" data-group="gender" data-val="回答しない" onclick="selectSurvey(this,'gender','surveyGender')">回答しない</button>
+    </div>
+
+    <button onclick="submitSurvey()" style="font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:0.15em;padding:12px 32px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:rgba(255,255,255,0.7);cursor:pointer;">送信する</button>
+    <div id="surveyDone" style="display:none;margin-top:16px;font-size:13px;color:#4ade80;">ありがとうございます！</div>
+  </div>
+</div>
+
+<script>
+const TYPES = [
+  {
+    id: 'observer',
+    name: 'Observer',
+    subtitle: '世界を観察する者',
+    animal: '🦉',
+    animalImage: 'assets/icons/observer.png',
+    color: '#4a6cf7',
+    desc: `世界を、そのまま受け取りません。一度立ち止まって、構造を見て、意味を探して、それからゆっくり自分の中に取り込みます。多くの人が感覚で動くとき、あなたは観察しています。それは鈍さではありません。深さです。
+
+Observerは、表面に見えているものより、その背後にある仕組みや文脈に関心を持ちます。「なぜそうなっているのか」「本当はどういう構造になっているのか」——そういう問いが、自然と頭の中に浮かんでくる。あなたにとって、世界は常に「読み解くべきテキスト」として存在しています。
+
+【強み】
+
+Observerの最大の強みは、「見えていないものを見る力」です。他の人が当たり前として流してしまう情報の中に、重要なパターンや矛盾を発見します。データでも、人間関係でも、組織の動きでも——Observerの目は、表層の下にあるものを捉えます。
+
+情報を集めて整理する力も卓越しています。闇雲に動くのではなく、十分な情報が揃ってから判断する。そのプロセスは時に遅く見えますが、Observerの判断はたいてい精度が高い。なぜなら、見落としが少ないからです。
+
+また、Observerは感情的にならずに物事を見られます。誰かが怒っているとき、誰かが喜んでいるとき、その感情の波に飲み込まれるのではなく、「なぜその感情が生まれているのか」を観察できる。これは冷たさではなく、一種の知的な優しさです。
+
+【エネルギーが落ちる場所】
+
+Observerが消耗するのは、「速さ」を強要される場面です。十分に考える時間を与えられないまま、その場で即断を求められる。情報が足りないまま動かなければならない。そういう環境では、Observerの強みはほとんど発揮できません。
+
+また、表面的な会話が続く場も苦手です。深い話をしたいのに、天気の話や当たり障りのないやり取りだけで終わってしまう場。Observerにとって、浅い交流は疲弊します。つながれた気がしないからです。
+
+集団の中で「空気を読んで動く」ことを求められる場面も、Observerには負荷がかかります。観察はできても、即座に場に合わせて動くことは得意ではない。そのズレを「気が利かない」と思われることがあり、それが積み重なると自信を失いやすくなります。
+
+【よく誤解されること】
+
+「何を考えているかわからない」と言われることがあります。でも、考えていないのではありません。むしろ考えすぎているくらい考えています。ただ、その思考が外に出てくるまでに時間がかかる。言葉にする前に、何度も内側で検証しているからです。
+
+「冷たい」「感情がない」と思われることもあります。でも違う。Observerは感情を持っていないのではなく、感情を外に出すタイミングと相手を慎重に選んでいます。信頼できる人の前では、驚くほど豊かな感情を持っていることがわかります。
+
+「消極的」に見られることもあります。でもObserverが動かないのは、怖いからではありません。まだ十分に観察が終わっていないからです。納得したら、静かに、でも確実に動きます。
+
+【もうひとつの顔】
+
+Observerの中には、観察したものを言葉や構造に変換する力を持つ人がいます。そういうタイプはObserver × Storytellerの性質を持ち、複雑なことをわかりやすく伝える力を発揮します。
+
+また、観察から得た洞察を設計や戦略に変えるObserverもいます。Observer × Architectとして、緻密な分析から鋭い構造を作り出す。そのタイプは、思想家であり設計者でもあります。
+
+どちらの顔を持っていても、Observerの核心は変わりません。「まず見る」。それがすべての起点です。
+
+【あなたへ】
+
+あなたは、世界を誰よりも丁寧に見ている人です。その観察眼は、多くの人が気づかないうちに場を救っていることがあります。あなたが「おかしい」と感じたことは、たいてい本当におかしい。その直感を、もう少し信じてください。
+
+ただ、観察し続けることは、時に孤独です。見えすぎるゆえに、踏み出せないことがある。完璧に理解してから動こうとするあまり、チャンスを逃すことがある。世界は、完全にわかってから動く場所ではありません。わかりながら動く場所です。
+
+あなたの観察は、誰かに届いてはじめて意味を持ちます。見たものを、少しだけ外に出してみてください。それがどんな形であれ、あなたの視点を必要としている人が、必ずいます。`
+  },
+  {
+    id: 'architect',
+    name: 'Architect',
+    subtitle: '設計する者',
+    animal: '🦊',
+    animalImage: 'assets/icons/architect.png',
+    color: '#C1121F',
+    desc: `世界を、感情ではなく「構造と戦略」として見ています。一度立ち止まって、全体を俯瞰して、最短ルートを描いて、それから動きます。多くの人が感覚で進むとき、あなたはすでに3手先を考えています。それは冷淡さではありません。思考の速さです。
+
+Architectは、混沌とした状況をシンプルな構造に変える力を持っています。「なぜうまくいっていないのか」「本当の問題はどこにあるのか」——そういう問いが自然と浮かんでくる。あなたにとって、世界は常に「設計し直せるシステム」として見えています。
+
+【強み】
+
+Architectの最大の強みは、「混沌に地図を描く力」です。他の人がまだ迷っている段階で、あなたはすでにゴールへの道筋を見えています。全体像を把握しながら優先順位をつけ、最短経路を見つける。その力は、混乱した場に秩序をもたらします。
+
+先を読む力も際立っています。今の状況から3手先、5手先を考える。リスクを事前に察知し、手を打っておく。Architectがいると、チームは「気づいたら問題が起きていなかった」という状態になります。それはArchitectが静かに、先回りして守っているからです。
+
+論理的な判断力も強みです。感情や空気に流されず、構造とデータで判断する。その冷静さは、感情が高ぶる重要な局面で特に力を発揮します。誰もが動揺しているとき、Architectだけが落ち着いて「次に何をすべきか」を見えています。
+
+【エネルギーが落ちる場所】
+
+行き当たりばったりの進行で、Architectは消耗します。方針が定まらないまま動き続ける場。何度も同じ議論を繰り返す会議。目的が不明瞭なまま進むプロジェクト。Architectにとって、方向のない動きは時間の無駄以上に、精神的な消耗です。
+
+感情論だけで動く場も苦手です。論理的に話し合いたいのに、感情的な反応ばかりが返ってくる。「正しいかどうか」より「気持ちがいいかどうか」で決まっていく場では、Architectの力はほとんど活きません。
+
+自分の設計や計画が無視される状況も、大きなストレスになります。せっかく考えた構造が、感情や慣習によってあっさり覆されるとき、Architectは深く消耗します。「なぜ伝わらないのか」という孤独を感じることがあります。
+
+【よく誤解されること】
+
+「冷たい」「人の気持ちを考えない」と思われることがあります。でも違う。Architectは感情を軽視しているのではなく、感情の向こうにある本質を見ようとしています。それが速すぎて、伝わらないことがある。内側では、誰よりも深く考えています。
+
+「話が難しい」「ついていけない」と言われることもあります。Architectにとっては当然の論理展開が、他の人には速すぎることがあります。これは傲慢さではなく、思考のスピードの問題です。伝える速度を少し落とすだけで、全員がついてこられるようになります。
+
+「融通が利かない」とも思われます。でもArchitectが譲らないのは、構造の整合性を守るためです。感情的な妥協よりも、論理的な一貫性を大切にしているからです。その頑固さは、長期的には必ず正しかったと証明されます。
+
+【もうひとつの顔】
+
+設計した構造を自ら形にする力を持つArchitectもいます。そういうタイプはArchitect × Builderの性質を持ち、考えるだけでなく作ることもできる。設計者であり、実装者でもあります。頭の中の設計図が、そのまま現実になる感覚を知っています。
+
+また、構造を言葉に変えて人を動かすArchitectもいます。Architect × Storytellerとして、論理と物語を組み合わせる力を発揮します。複雑な戦略を、誰にでも伝わるストーリーに変換できる。そのタイプは、思想家であり、伝道者でもあります。
+
+【あなたへ】
+
+あなたは混沌に地図を描く人です。多くの人が迷っているとき、あなたはすでにゴールへの道筋を見ています。その力を、遠慮せずに使ってください。あなたの設計は、誰かの人生を変える力を持っています。
+
+ただ、地図は誰かと一緒に歩いてはじめて意味を持ちます。あなたの設計がどれだけ優れていても、人が動かなければ現実は変わりません。構造を作る力と同じくらい、人を信じて委ねる力を育てていってください。あなたの設計は、人を動かすとき初めて世界を変えます。`
+  },
+  {
+    id: 'connector',
+    name: 'Connector',
+    subtitle: '人をつなぐ者',
+    animal: '🐝',
+    animalImage: 'assets/icons/connector.png',
+    color: '#F4B400',
+    desc: `世界を、個人ではなく「関係性」として見ています。一度立ち止まって、この人とあの人の接点を探して、化学反応が起きそうな組み合わせを見つけて、そっとつないでいく。多くの人が個々の能力を見るとき、あなたはその人たちの間にある可能性を見ています。これは八方美人ではありません。構造を人で見ている、ということです。
+
+Connectorは、人と人の間に橋をかける人です。「この人とあの人が話したら面白いことが起きそう」「この人の強みは、あの人の弱みを補える」——そういう直感が、自然と浮かんでくる。あなたにとって、世界は常に「まだつながっていない可能性」として見えています。
+
+【強み】
+
+Connectorの最大の強みは、「初対面でも距離を縮める力」です。相手の緊張をほぐし、自然な会話を生み出す。その場にいるだけで、空気がやわらかくなります。誰もが構えている場に入ったとき、あなたが笑顔を向けるだけで、場の温度が変わります。
+
+異なる人や文化をつなげる力も際立っています。共通点を見つける目が鋭く、違う世界にいる人たちの間に橋をかけることができる。「こんな人がいるんだけど、会ってみない？」という一言が、誰かの人生を変えることがある。その力は、多様性が求められる時代に特に輝きます。
+
+人の強みを直感的に把握する力もあります。この人は何が得意か、何を求めているか。それを会話の中で自然と感じ取り、適切な人や機会につなぐことができます。人材の見立てが正確で、チームの組み合わせを変えるだけで成果が変わることを、Connectorは経験で知っています。
+
+【エネルギーが落ちる場所】
+
+孤立した作業が続く場で、Connectorは消耗します。一人で黙々と進める仕事。誰とも話さない時間が長く続く環境。画面だけを見続ける作業。Connectorにとって、人との接点のない場所は酸欠に近い感覚があります。
+
+競争より排除が起きている環境も苦手です。誰かが孤立していたり、排除されていたりする場に、Connectorは強い不快感を感じます。「あの人は関係ない」という空気が、Connectorには耐えられないほど苦しい。
+
+人間関係が固定化された閉じたコミュニティも、Connectorには窮屈です。いつも同じ顔ぶれ、いつも同じ会話。新しい出会いや化学反応が生まれない場所では、Connectorの才能は発揮されません。
+
+【よく誤解されること】
+
+「軽い」「深みがない」と思われることがあります。でも違う。Connectorは、広さの中に深さを持っています。多くの人と関わるのは、それだけ多くの世界を知っているということです。一人ひとりとの関係は、表面的に見えても、Connectorにとっては真剣なつながりです。
+
+「誰にでも同じ顔を見せる」と思われることもあります。でもConnectorは、相手に合わせた接し方をしているのであって、自分を失っているわけではありません。それは柔軟さであり、相手への敬意です。全員に「あなた専用の接し方」をしている、ということです。
+
+「自分の意見がない」と言われることもあります。でもConnectorが場の調和を優先するのは、全体がうまくいくことを大切にしているからです。自分の意見を押し通すより、全員が前に進める方法を探している。それは自己主張の欠如ではなく、全体最適の選択です。
+
+【もうひとつの顔】
+
+つないだ人たちの間で物語を生む力を持つConnectorもいます。そういうタイプはConnector × Storytellerの性質を持ち、関係性の中から意味を見出して伝えます。つながりに名前をつけ、物語にして届ける。その力は、コミュニティを文化に変えます。
+
+また、つながりを構造として設計するConnectorもいます。Connector × Architectとして、コミュニティや組織の設計に力を発揮します。誰と誰をつなぐかを戦略的に考え、意図的に化学反応を起こす。そのタイプは、場の設計者であり、触媒でもあります。
+
+【あなたへ】
+
+あなたは人と人の間に橋をかける人です。あなたがいるだけで、場の可能性が広がります。あなたが引き合わせた二人が、その後大きなことを一緒に成し遂げることがある。その存在の価値を、もっと信じてください。
+
+ただ、つなぎすぎて自分を見失わないように。あなた自身も、誰かにつないでもらう側でいていいんです。与えることと同じくらい、受け取ることを大切にしてください。あなたが受け取るとき、誰かが「つなぐ喜び」を感じています。`
+  },
+  {
+    id: 'storyteller',
+    name: 'Storyteller',
+    subtitle: '物語を届ける者',
+    animal: '🦚',
+    animalImage: 'assets/icons/storyteller.png',
+    color: '#C2185B',
+    desc: `世界を、事実ではなく「意味と物語」として見ています。一度立ち止まって、その出来事の文脈を読んで、感情を言葉に変えて、誰かに届けていく。多くの人が数字や結果だけを見るとき、あなたはその背後にある「なぜ」と「意味」を見ています。それは大げさではありません。解像度の違いです。
+
+Storytellerは、世界に意味を与える人です。「なぜこれが起きたのか」「この出来事は何を伝えているのか」——そういう問いが自然と浮かんでくる。あなたにとって、世界は常に「まだ語られていない物語」として存在しています。
+
+【強み】
+
+Storytellerの最大の強みは、「言葉で人の心を動かす力」です。同じ情報でも、Storytellerが伝えると届き方が変わります。聞いた人の中に何かが残る。感情が動く。行動が生まれる。それがStoryttellerの言葉の力です。
+
+複雑なことをわかりやすく伝える力も際立っています。難しい概念や感情を、誰にでも伝わる言葉に変換できる。専門家でも伝えられないことを、あなたは自然な言葉で届けられる。その翻訳能力は、教育や発信の場で特に輝きます。
+
+場に感情と意味をもたらす力もあります。Storytellerがいると、出来事がただの出来事ではなくなります。意味が生まれ、人がつながり、前に進む力が生まれます。あなたが語ると、人は「自分にも関係がある」と感じ始めます。
+
+【エネルギーが落ちる場所】
+
+数字と効率だけの会話が続く場で、Storytellerは消耗します。感情を排した意思決定。意味より成果だけが問われる環境。「それで数字はどうなるの？」という言葉が飛び交う場。Storytellerにとって、意味のない場所は息ができない場所です。
+
+表現を削られる場も苦手です。「それは必要ない」「シンプルにしてください」と、自分の言葉が削ぎ落とされていく感覚は、Storytellerには痛みとして伝わります。表現はStoryttellerにとって装飾ではなく、意味そのものだからです。
+
+伝える相手がいない孤独な作業も、Storytellerには向きません。誰かに届けてこそ、言葉は生きます。反応があってこそ、表現は完成します。完成した作品を誰も読まない状況は、Storytellerにとって深い消耗です。
+
+【よく誤解されること】
+
+「感情的」「非論理的」と思われることがあります。でも違う。Storytellerは、論理の外にある真実を見ています。数字で測れないものにも、確かな重さがある。人が動く理由のほとんどは、データではなく物語です。それを知っているのがStoryttellerです。
+
+「現実を見ていない」と言われることもあります。でもStoryttellerが見ているのは、現実の別の側面です。数字に見えない部分に、人の行動の本当の理由があることを、Storytellerは知っています。それは非現実ではなく、より深い現実です。
+
+「大げさ」と思われることもあります。でもStoryttellerにとって、表現は感情の誇張ではなく、伝えるための最適化です。言葉の強さを上げることで、届く距離が変わります。それはStoryttellerが経験で知っている事実です。
+
+【もうひとつの顔】
+
+物語を構造化して戦略に変える力を持つStoryttellerもいます。そういうタイプはStoryteller × Architectの性質を持ち、物語と論理を組み合わせます。感情を動かしながら、同時に構造として機能する言葉を作れる。そのタイプは、思想家であり戦略家でもあります。
+
+また、物語を通じて人をつなげるStoryttellerもいます。Storyteller × Connectorとして、言葉でコミュニティを生み出す力を発揮します。あなたの語りが、ばらばらだった人たちを一つにする。そういう場を作れる人です。
+
+【あなたへ】
+
+あなたは世界に意味を与える人です。あなたの言葉がなければ、多くのことは伝わらないまま消えていた。データだけでは動かなかった人が、あなたの言葉で動き出す。その力の価値を、もっと信じてください。
+
+ただ、伝えることに疲れたときは、自分のための物語を書いてみてください。誰かのためだけでなく、自分自身に届ける言葉を持つこと。あなたの表現は、自分を救う力も持っています。あなたが一番必要としているのは、あなた自身の物語かもしれません。`
+  },
+  {
+    id: 'builder',
+    name: 'Builder',
+    subtitle: '形にする者',
+    animal: '🦫',
+    animalImage: 'assets/icons/builder.png',
+    color: '#F57C00',
+    desc: `世界を、アイデアではなく「実装」として見ています。一度聞いたら、どうすれば動くかを考え始めます。何が足りないか。どこから始めればいいか。それを、考えながら同時に作っていく。多くの人がまだ話し合っているとき、あなたはすでに手を動かしています。これは短慮ではありません。現実への誠実さです。
+
+Builderは、言葉を現実に変える人です。「こんなものがあればいいのに」という願いが、Builderの手に渡った瞬間に動き始めます。あなたにとって、世界は常に「まだ作られていないもの」として見えています。
+
+【強み】
+
+Builderの最大の強みは、「抽象を具体に変える力」です。曖昧なビジョンを、実際に動くものに変換できる。「こんな感じで」という言葉から、完成品を想像して形にする。その翻訳能力は、チームにとって非常に価値があります。アイデアは、Builderがいてはじめて現実になります。
+
+最後まで粘る力も強みです。途中で問題が起きても、諦めずに解決策を探す。完成するまで手を止めない。「なぜ動かないのか」を解明するまで向き合い続ける。その粘り強さが、Builderを誰よりも信頼できる存在にしています。
+
+地道な工程を厭わないことも、Builderの特徴です。華やかではない細かい作業も、丁寧にこなす。完成に向かう過程そのものに喜びを感じる。積み重ねることの価値を、頭ではなく身体でわかっています。
+
+【エネルギーが落ちる場所】
+
+話してばかりで動かない場所で、Builderは消耗します。会議が終わっても何も変わらない。アイデアだけが積み上がって、実装に移らない。「で、いつ作るの？」という問いがずっと宙に浮いている場。そういう環境では、Builderの力は完全に宙に浮いたままになります。
+
+コロコロ変わる仕様も苦手です。せっかく作ったものが、方針変更によって無駄になる。また一から作り直す。その繰り返しは、Builderにとって深い消耗です。作ることへの信頼が、少しずつ削られていきます。
+
+成果が見えない仕事も苦手です。自分が何を作っているのか、それが何の役に立つのかがわからない状態が続くと、Builderはエネルギーを失います。完成した形と、それが誰かの役に立つ瞬間が、Builderの燃料です。
+
+【よく誤解されること】
+
+「融通が利かない」「頑固」と思われることがあります。でも違う。Builderは、一度決めたことを最後まで形にすることに価値を置いています。変更のたびに何かが壊れる感覚がある。それは意固地ではなく、誠実さの裏返しです。完成させることへの責任感が、そう見せているだけです。
+
+「スピードが遅い」と思われることもあります。でもBuilderが時間をかけるのは、手を抜かないからです。速く動くより、確実に動くことを選んでいます。あとから直す手間より、最初に丁寧に作る方が、長い目で見れば速いことをBuilderは知っています。
+
+「視野が狭い」と言われることもあります。でも深く集中できることは、Builderの強みです。全体を見渡すより、目の前のものを完璧に仕上げることに喜びを感じる。そのフォーカスの深さが、他の人には作れないものを作り上げます。
+
+【もうひとつの顔】
+
+作りながら設計も同時にできるBuilderもいます。そういうタイプはBuilder × Architectの性質を持ち、構造を考えながら実装を進める。「なぜこう作るのか」を常に意識しながら手を動かす。エンジニアリングの世界では、この組み合わせが最も強力です。
+
+また、作ったものを人に届ける力を持つBuilderもいます。Builder × Connectorとして、実装と人をつなぐ役割を担います。作るだけでなく、作ったものが誰の手に届いてどう使われるかまで考えられる。そのタイプは、職人であり、届け手でもあります。
+
+【あなたへ】
+
+あなたは言葉を現実に変える人です。あなたがいなければ、世界のほとんどのアイデアはアイデアのままで終わっていた。会議で話されたことが、あなたの手によって初めて存在するようになる。その力の価値を、もっと自覚してください。
+
+ただ、作ることに集中しすぎて、立ち止まって見渡すことも忘れないでください。完成させることと、方向を確認することは、どちらも大切です。あなたの手が一度止まったとき、初めて全体が見えることがあります。その「立ち止まる勇気」が、あなたをさらに遠くへ連れていきます。`
+  },
+  {
+    id: 'guardian',
+    name: 'Guardian',
+    subtitle: '守り、安定させる者',
+    animal: '🐘',
+    animalImage: 'assets/icons/guardian.png',
+    color: '#2E9E5E',
+    desc: `世界を、変化ではなく「継続と安全」として見ています。一度立ち止まって、何が守られるべきかを確認して、リスクを整理して、それから動きます。多くの人が勢いで進むとき、あなたは「本当にこれで大丈夫か」を確認しています。これは保守的ではありません。長期的な視点を持っているということです。
+
+Guardianは、世界に安心をもたらす人です。「何かあったときに守れるか」「これは長く続けられるか」——そういう問いが自然と浮かんでくる。あなたにとって、世界は常に「守るべき大切なもの」として見えています。
+
+【強み】
+
+Guardianの最大の強みは、「リスクを事前に察知する力」です。問題が起きる前に、問題の種を見つけることができる。他の人が気づかない小さなほころびに気づき、大きくなる前に手を打つ。その予見力は、チームを守る見えない盾になります。
+
+一貫性を保つ力も際立っています。ぶれない。約束を守る。長期間にわたって信頼を積み上げる。「あの人が言うなら大丈夫」と思われる存在になる。その安定感が、Guardianをチームにとって欠かせない存在にしています。
+
+人が安心して動ける環境を作る力もあります。ルールや仕組みを整え、誰もが安全に動ける場を作る。その力は、組織の土台として静かに機能します。Guardianがいるから、他の人が思い切って動けます。
+
+【エネルギーが落ちる場所】
+
+無計画な変化の連続で、Guardianは消耗します。根拠のない楽観論。「とりあえずやってみよう」で動き続ける場。失敗したら直せばいいという雰囲気。Guardianにとって、準備なしに動くことは、リスクを無視することと同じです。
+
+約束が守られない環境も大きなストレスです。言ったことと違うことが起きる。決めたことがいつの間にか変わっている。一度壊れた信頼は、なかなか元に戻らない。そういう環境では、Guardianは根っこから力を失っていきます。
+
+安全より速度が優先される場も苦手です。丁寧に進めたいのに、スピードだけを求められる。「考えすぎ」「慎重すぎ」と言われる。その圧力が積み重なると、Guardianは自分の判断を信じられなくなっていきます。
+
+【よく誤解されること】
+
+「変化を嫌う」「消極的」と思われることがあります。でも違う。Guardianは変化を否定しているのではなく、変化が安全に着地できるかを見ています。壊れてから直すより、壊れないようにする方が賢い。それを知っているのがGuardianです。
+
+「遅い」「決断できない」と言われることもあります。でもGuardianが慎重なのは、先を見ているからです。見えているリスクを無視して進むことができないだけです。その慎重さが、長い目で見ると最も速い道だったことが多い。
+
+「面白みがない」と思われることもあります。でも安定の中にこそ、長く続く価値があります。派手に始まってすぐ消えるものより、静かに続くものの方が、世界をより深く変えます。Guardianが作る土台の上で、他の人が輝けます。
+
+【もうひとつの顔】
+
+安定した基盤の上で人を育てる力を持つGuardianもいます。そういうタイプはGuardian × Weaverの性質を持ち、安心できる場を作りながら人をつなぎます。守ることと、育てることを同時にできる。そのタイプは、守護者であり、育て手でもあります。
+
+また、安全な構造を設計するGuardianもいます。Guardian × Architectとして、リスク管理と設計を組み合わせる力を発揮します。「壊れない仕組み」を作ることに喜びを感じる。そのタイプは、静かですが、組織の中で最も重要な役割を果たしています。
+
+【あなたへ】
+
+あなたは世界に安心をもたらす人です。あなたがいるから、他の人が思い切って動けます。あなたの慎重さが、チームを何度も救っていることがあります。その価値を、もっと誇りに思ってください。
+
+ただ、守ることに集中しすぎて、自分自身の冒険を後回しにしないでください。あなたが一歩踏み出すとき、周りは必ずついてきます。安定を作ることと、自分が動くこと。その両方があって、Guardianは完成します。あなた自身が動くとき、守ってきたものがはじめて意味を持ちます。`
+  },
+  {
+    id: 'explorer',
+    name: 'Explorer',
+    subtitle: '未知を試す者',
+    animal: '🐙',
+    animalImage: 'assets/icons/explorer.png',
+    color: '#8E7CC3',
+    desc: `世界を、答えではなく「問い」として見ています。一度見たものに満足せず、もっと先に何があるかを確かめたくなる。確認された道より、まだ誰も歩いていない道に足を向ける。これは計画のなさではありません。感度の高さです。未知であること自体が、あなたにとっての燃料です。
+
+Explorerは、世界の可能性を最初に見つける人です。「これはどうなるんだろう」「やってみたらどうなる？」——その問いが、Explorerを動かし続けます。答えを持っている人より、問いを持っている人のほうが、世界を広げることができる。あなたはその最前線にいる人です。
+
+【強み】
+
+Explorerの最大の強みは、「まだ誰も気づいていないものを見つける力」です。可能性の匂いを嗅ぎつける感度が異常に高い。試すことへの恐怖が薄く、失敗を失敗と思わずに「データ」として受け取れる。だから他の人が躊躇する場所にも、軽やかに踏み込んでいけます。
+
+アイデアの多様性も際立っています。一つの問題に対して、複数のアプローチを同時に思いつく。思考が広がる方向に動くので、誰も考えなかった解決策が自然と出てくることがあります。その発想の自由さが、停滞した場に風を吹き込みます。
+
+変化への適応力も高い。環境が変わっても、むしろそれを面白がれる。新しい状況をゼロから楽しめる力は、変化の激しい時代において大きな武器になります。誰もが困惑している場面で、あなただけが「これは面白い」と感じていることがあります。
+
+【エネルギーが落ちる場所】
+
+同じことの繰り返しが続く場所で、Explorerは消耗します。昨日と同じ今日、今日と同じ明日。ルーティンに意味を感じられなくなったとき、急速にエネルギーが落ちます。「また同じことをやるのか」という感覚が、Explorerにとって最大の消耗です。
+
+「前例がないから」という理由で却下される場面も苦手です。可能性を塞がれる感覚が、Explorerには息苦しさとして伝わります。完成を強く求められる環境も同様です。Explorerは「途中」に面白さを感じるので、ゴールだけを求められる場は窮屈です。
+
+自由度のない環境、細かいルールで動く組織、マニュアル通りにしか動けない場。そういう場所では、Explorerの才能の大半が眠ったままになります。可能性が見えない場所では、Explorerは力を発揮できません。
+
+【よく誤解されること】
+
+「飽きっぽい」「続かない」と思われることがあります。でも違う。Explorerは、可能性が見えている間は誰よりも燃えています。可能性が尽きたと感じた瞬間に次へ向かう。それは逃げではなく、センサーが正直なだけです。まだ誰も踏み込んでいない場所にこそ、Explorerの本気があります。
+
+「軽い」「深みがない」と思われることもあります。でもExplorerは、広さの中に深さを持っています。多くの領域に触れてきたからこそ、点と点をつなぐ力がある。その力は、一つのことだけを深めてきた人には出せない発想を生みます。
+
+「計画性がない」とも言われます。でもExplorerの動き方は、計画より感度で動くスタイルです。地図を持たずに歩けるのは、方向感覚があるからです。地図より、羅針盤を持って動いています。
+
+【もうひとつの顔】
+
+発見したものを観察し、構造として理解するExplorerもいます。そういうタイプはExplorer × Observerの性質を持ち、広い探索と深い分析を両立させます。踏み込んだ後に、しっかりと読み解く力も持つ。その組み合わせは、最強の発見者です。
+
+また、発見したものを言葉や物語に変えて届けるExplorerもいます。Explorer × Storytellerとして、新しい世界を人に伝える力を持ちます。旅人であり、語り部でもある。どちらの顔を持っていても、Explorerの核心は変わりません。「まず試す」。それがすべての始まりです。
+
+【あなたへ】
+
+あなたは世界の可能性を最初に見つける人です。地図のない場所を歩けるのは、あなたがいるからです。その感度を、誰かに合わせて鈍らせないでください。あなたが「面白そう」と感じた直感は、たいてい正しい。
+
+ただ、発見したものを誰かに渡すことも、たまには試してみてください。あなたの冒険は、誰かに届いたとき初めて世界に根を張ります。探索し続けることと、立ち止まって伝えること。その両方ができたとき、Explorerは最も輝きます。`
+  },
+  {
+    id: 'weaver',
+    name: 'Weaver',
+    subtitle: '調和を織る者',
+    animal: '🐬',
+    animalImage: 'assets/icons/weaver.png',
+    color: '#00ACC1',
+    desc: `世界を、勝ち負けではなく「関係の質」として見ています。一度立ち止まって、誰が傷ついているかを感じて、何を言えば場がやわらかくなるかを探して、そっと動きます。多くの人が結果だけを見るとき、あなたはその場にいる人の感情を見ています。これは優柔不断ではありません。調和を構造として見ているということです。
+
+Weaverは、世界の温度を保つ人です。「誰かが傷ついていないか」「すれ違いが起きていないか」——そういう問いが自然と浮かんでくる。あなたにとって、世界は常に「誰かのケアを必要としている場所」として見えています。
+
+【強み】
+
+Weaverの最大の強みは、「対立を和らげる力」です。感情的になっている人の言葉の奥にある本音を感じ取り、橋をかける言葉を見つけられる。誰もがぶつかり合っている場面で、あなただけが全員の気持ちを同時に理解しています。その力は、チームの危機的な場面で特に輝きます。
+
+誰も取り残さない動きができます。場の空気を読みながら、声を上げられていない人にも目を向ける。「あの人、さっきから黙っているな」と気づける。多様な人が共存できる場を、意識せずに自然と作っていきます。
+
+場の感情の変化を敏感に察知する力も際立っています。誰かが傷ついた瞬間、誰かが孤立し始めた瞬間を、言葉にならない段階で感じ取る。その感度が、問題が大きくなる前に場を整えることを可能にします。Weaverがいるだけで、場の空気が変わります。
+
+【エネルギーが落ちる場所】
+
+対立が常態化している場で、Weaverは消耗します。争いが当たり前になっている環境。誰かを犠牲にすることが前提の意思決定。「勝つか負けるか」だけが評価される場。そういう場では、Weaverは疲弊し続けます。
+
+自分の感覚を無視し続ける状況も、Weaverには大きな負荷です。場を保つために自分の感情を抑え続けると、やがて何も感じなくなっていきます。誰かのために動きすぎて、自分のエネルギーが尽きていることに気づかないことがあります。
+
+競争だけが評価される環境も苦手です。協調より競争が美徳とされる場では、Weaverの強みは評価されにくい。「あなたは何を成果として出したの？」と問われたとき、Weaverは答えに詰まることがある。その見えにくさが、Weaverを孤独にさせることがあります。
+
+【よく誤解されること】
+
+「意見がない」「流される」と思われることがあります。でも違う。Weaverは、自分の意見より場の調和を優先しているだけです。それは弱さではなく、全体を見ている強さです。場の全員の気持ちを同時に持っているから、一つの立場に簡単に固定できないのです。
+
+「八方美人」と思われることもあります。でもWeaverが誰にでも優しくするのは、誰にでも傷つく可能性があることを知っているからです。それは計算ではなく、感受性の深さです。あなたの優しさは、戦略ではなく本能です。
+
+「自分がない」と言われることもあります。でもWeaverは、自分を消しているのではなく、場に合わせて表現を変えています。場を読む力が高いゆえの柔軟さです。その適応力は、あなたが思っている以上に稀有な才能です。
+
+【もうひとつの顔】
+
+調和を保ちながら人を守る力を持つWeaverもいます。そういうタイプはWeaver × Guardianの性質を持ち、安全な場を作りながら誰も傷つけない環境を維持します。支えながら守る。その二つを同時にできる人は、多くはありません。
+
+また、関係性の中から物語を見出すWeaverもいます。Weaver × Storytellerとして、人と人のつながりに意味を与える言葉を紡ぎます。誰かと誰かがつながった瞬間の美しさを言葉にできる。そのタイプは、織り手であり、語り手でもあります。
+
+【あなたへ】
+
+あなたは世界の温度を保つ人です。あなたがいるだけで、場がやわらかくなります。誰かが孤立しかけたとき、あなたがいたから救われた。その存在の価値を、もっと信じてください。
+
+ただ、あなた自身の感情も、同じくらい大切にしてください。誰かの痛みに敏感なあなたが、自分の痛みに鈍感になっていないか。自分を織ることも、Weaverの仕事です。あなたが整っているとき、場は最もよく整います。あなた自身を大切にすることが、世界への最大の貢献です。`
+  }
+];
+
+const QUESTIONS = [
+  // Observer × 4
+  { type: 'observer', text: '人が当たり前だと思って流していることに、違和感を覚えることが多い。' },
+  { type: 'observer', text: 'ものごとの「結果」より「なぜそうなったか」のプロセスに強く惹かれる。' },
+  { type: 'observer', text: '複雑な情報を前にしたとき、全体の構造が見えるまでじっくり観察したい。' },
+  { type: 'observer', text: '誰かの行動を見て、本人も気づいていない動機やパターンが見えることがある。' },
+  // Architect × 4
+  { type: 'architect', text: '混乱した状況を見ると、「どう整理すればいいか」が自然に浮かぶ。' },
+  { type: 'architect', text: '目標を聞くと、自動的に「逆算するとまず何をすべきか」が見える。' },
+  { type: 'architect', text: '感情的な議論の中でも、問題の構造を冷静に見ていられる。' },
+  { type: 'architect', text: 'うまくいっている状況でも、もっと良い構造に変えられないかを考えている。' },
+  // Connector × 4
+  { type: 'connector', text: '異なる世界にいる人同士を引き合わせて、何かが生まれる瞬間が好きだ。' },
+  { type: 'connector', text: '初対面の場で、気づくと自分が人と人の間を取り持つ役割になっている。' },
+  { type: 'connector', text: '人の強みを見抜くのが得意で、「この人にはこの役割が合う」と直感でわかる。' },
+  { type: 'connector', text: '自分のネットワークの中で、「あの人とこの人はまだ会ったことがない」ということが気になる。' },
+  // Storyteller × 4
+  { type: 'storyteller', text: '同じ出来事でも、自分が伝えると相手の反応が変わると感じたことがある。' },
+  { type: 'storyteller', text: '心が動いた瞬間を、言葉や形にして残したいという衝動がある。' },
+  { type: 'storyteller', text: '数字やデータだけでは伝わらない「意味」を、言葉で補いたくなる。' },
+  { type: 'storyteller', text: '事実をそのまま伝えるより、文脈や背景を添えて伝える方が自然だ。' },
+  // Builder × 4
+  { type: 'builder', text: 'アイデアを聞いたとき、「面白い」より先に「どう作るか」を考え始める。' },
+  { type: 'builder', text: '完成したものを眺める瞬間より、作っている最中が一番充実している。' },
+  { type: 'builder', text: '「考えすぎる前にまず手を動かす」方が、自分はうまくいく。' },
+  { type: 'builder', text: '途中で問題が起きても、完成するまで投げ出さずに向き合い続ける。' },
+  // Guardian × 4
+  { type: 'guardian', text: '「このまま進めて本当に大丈夫か」と、周囲が楽観的なときほど気になる。' },
+  { type: 'guardian', text: '一度交わした約束は、相手が忘れていても自分は覚えていて、守ろうとする。' },
+  { type: 'guardian', text: 'チームや大切な人を守るためなら、自分が目立たない役回りでも構わない。' },
+  { type: 'guardian', text: '急な方針変更や、根拠のない「とりあえずやってみよう」に強い抵抗を感じる。' },
+  // Explorer × 4
+  { type: 'explorer', text: '「正解がわからない状況」に置かれたとき、不安より先にワクワクが来る。' },
+  { type: 'explorer', text: '一つの分野を極めるより、複数の未知の領域に触れている方がエネルギーが湧く。' },
+  { type: 'explorer', text: 'ルールや前例がない方が、かえって自由に動けると感じる。' },
+  { type: 'explorer', text: '同じ場所に長くいると、まだ見ていない場所のことが気になり始める。' },
+  // Weaver × 4
+  { type: 'weaver', text: '誰かが発言できずにいるとき、自然とその人に目が向く。' },
+  { type: 'weaver', text: 'チーム内で対立が起きたとき、どちらの気持ちも同時に理解できてしまう。' },
+  { type: 'weaver', text: '自分が成果を出すより、誰かが自分のサポートで成功する方が深い喜びを感じる。' },
+  { type: 'weaver', text: '場の空気が変わった瞬間を、言葉にされる前に感じ取ることができる。' },
+];
+
+// Shuffle questions
+const questions = [...QUESTIONS].sort(() => Math.random() - 0.5);
+
+const SCALE = ['全く当てはまらない', 'あまり当てはまらない', 'どちらともいえない', 'やや当てはまる', '非常に当てはまる'];
+
+let answers = new Array(questions.length).fill(null);
+let current = 0;
+
+// Init type preview
+const preview = document.getElementById('typePreview');
+const shortNames = { observer:'Ob', architect:'Ar', connector:'Co', storyteller:'St', builder:'Bu', guardian:'Gu', explorer:'Ex', weaver:'We' };
+TYPES.forEach(t => {
+  const chip = document.createElement('div');
+  chip.className = 'type-chip';
+  chip.innerHTML = t.animalImage
+    ? `<img src="${t.animalImage}" style="width:28px;height:28px;object-fit:contain;image-rendering:pixelated;"><span style="font-weight:600;letter-spacing:0.05em;">${shortNames[t.id] || t.name.substring(0,2)}</span>`
+    : `<span style="font-size:24px;line-height:1;">${t.animal}</span><span style="font-weight:600;letter-spacing:0.05em;">${shortNames[t.id] || t.name.substring(0,2)}</span>`;
+  chip.addEventListener('click', () => {
+    document.documentElement.style.setProperty('--type-color', t.color);
+    window._resultType = t;
+    renderPrompts(t);
+    drawCycleMap(t);
+    renderBaton(t);
+    document.getElementById('rInitial').textContent = t.name.substring(0,2);
+    document.getElementById('rAnimal').innerHTML = t.animalImage
+      ? `<img src="${t.animalImage}" style="height:1em;width:1em;object-fit:contain;image-rendering:pixelated;">`
+      : `<span style="font-size:1em;">${t.animal}</span>`;
+    document.getElementById('rAnimalName').textContent = t.animalName;
+    document.getElementById('rType').textContent = t.name;
+    document.getElementById('rSubtitle').textContent = t.subtitle;
+    const fd = t.desc.replace(/【(.+?)】/g, '<span class="desc-heading">$1</span>');
+    document.getElementById('rDesc').innerHTML = fd;
+    const barsEl = document.getElementById('scoresBars');
+    barsEl.innerHTML = '';
+    document.querySelector('.scores-section').style.display = 'none';
+    showScreen('result');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    drawShareCard(t);
+    const em = document.getElementById('shareEmoji');
+    if (em) em.innerHTML = `<span style="font-size:2em;line-height:1;">${t.animal}</span>`;
+  });
+  preview.appendChild(chip);
+});
+
+function introShareX() {
+  const text = '人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。';
+  const url = 'https://rolemap.jp';
+  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+function introShareThreads() {
+  const url = 'https://rolemap.jp';
+  window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent('人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。 ' + url)}`, '_blank');
+}
+
+function introShareFacebook() {
+  const url = 'https://rolemap.jp';
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+}
+
+function introShareLine() {
+  const text = '人は優劣ではなく、役割でできている。あなたの役割タイプを診断しよう。';
+  const url = 'https://rolemap.jp';
+  window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function introShareCopy() {
+  navigator.clipboard.writeText('https://rolemap.jp').then(() => {
+    const btn = document.getElementById('introCopyBtn');
+    btn.style.color = '#4ade80';
+    setTimeout(() => { btn.style.color = ''; }, 1500);
+  });
+}
+
+function toggleAccordion(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  body.style.maxHeight = isOpen ? '0' : body.scrollHeight + 'px';
+}
+
+const CATCHCOPY = {
+  observer:    '見えていないものが、見える。',
+  architect:   '混沌に、地図を描く。',
+  storyteller: '言葉で、世界の温度を変える。',
+  builder:     '言葉を、現実に変える。',
+  connector:   '人と人の間に、化学反応を起こす。',
+  guardian:    'あなたがいるから、みんなが動ける。',
+  explorer:    'まだ誰も歩いていない道が、燃料。',
+  weaver:      '全員の味方でいられる、唯一の人。',
+};
+
+function startQuiz() {
+  showScreen('quiz');
+  renderQuestion();
+}
+
+// ===== キリ番カウンター =====
+// ===== Supabase設定 =====
+const SUPABASE_URL = 'https://gnetrsixfdwixtalzgzh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZXRyc2l4ZmR3aXh0YWx6Z3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTE2NTIsImV4cCI6MjA5MjI2NzY1Mn0.no_DiHOLpv1vqI0eJZgXJU-uAGBVsqlt2HDyJPYeXek';
+
+async function supabaseFetch(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || '',
+      ...options.headers
+    },
+    ...options
+  });
+  if (!res.ok) return null;
+  try { return await res.json(); } catch { return null; }
+}
+
+async function incrementVisitor() {
+  // カウントを+1
+  await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_visitor`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal',
+    },
+    body: '{}'
+  });
+  // カウントを取得して表示
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/visitors?select=*`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    }
+  });
+  const data = await res.json();
+  if (data && data[0] && data[0].visitor_count !== undefined) {
+    renderVisitorCount(data[0].visitor_count);
+    if (isKiriban(data[0].visitor_count)) showKiriban(data[0].visitor_count);
+  }
+}
+
+function renderVisitorCount(count) {
+  const el = document.getElementById('visitorDigits');
+  if (!el) return;
+  const str = String(count);
+  let html = '';
+  for (let i = 0; i < str.length; i++) {
+    if (i > 0 && (str.length - i) % 3 === 0) {
+      html += `<span class="counter-comma">,</span>`;
+    }
+    html += `<span class="counter-digit">${str[i]}</span>`;
+  }
+  el.innerHTML = html;
+}
+
+async function saveDiagnosis(typeId, ageGroup = null, gender = null) {
+  await supabaseFetch('diagnoses', {
+    method: 'POST',
+    prefer: 'return=minimal',
+    body: JSON.stringify({
+      type: typeId,
+      country: 'Japan',
+      age_group: ageGroup,
+      gender: gender
+    })
+  });
+}
+
+function initVisitorCounter() {
+  incrementVisitor();
+}
+document.addEventListener('DOMContentLoaded', initVisitorCounter);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const total = questions.length;
+
+  document.getElementById('qCounter').textContent = `Q ${String(current+1).padStart(2,'0')} / ${total}`;
+  document.getElementById('qNumber').textContent = `Question ${String(current+1).padStart(2,'0')}`;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('progressFill').style.width = `${((current+1)/total)*100}%`;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  SCALE.forEach((label, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="option-label">${i+1}</span><span>${label}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+
+  document.getElementById('prevBtn').disabled = current === 0;
+  // 最後の問題で既に回答済みの場合のみ「結果を見る」を表示
+  const nextBtn = document.getElementById('nextBtn');
+  if (current === total - 1 && answers[current] !== null) {
+    nextBtn.style.display = 'block';
+  } else {
+    nextBtn.style.display = 'none';
+  }
+
+  // Update orb color
+  const type = TYPES.find(t => t.id === q.type);
+  document.getElementById('orb1').style.background = `radial-gradient(circle, ${type.color}88, transparent 70%)`;
+}
+
+function fadeToNext(fn) {
+  const card = document.querySelector('.question-card');
+  card.classList.add('fade-out');
+  setTimeout(() => {
+    fn();
+    card.classList.remove('fade-out');
+  }, 200);
+}
+
+function selectAnswer(val) {
+  answers[current] = val;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === val);
+  });
+
+  const total = questions.length;
+  if (current === total - 1) {
+    // 最後の問題だけ「結果を見る」ボタンを表示
+    document.getElementById('nextBtn').style.display = 'block';
+  } else {
+    // フェードアウト → 次の問題 → フェードイン
+    setTimeout(() => {
+      fadeToNext(() => {
+        current++;
+        renderQuestion();
+      });
+    }, 150);
+  }
+}
+
+function nextQ() {
+  if (current < questions.length - 1) {
+    fadeToNext(() => {
+      current++;
+      renderQuestion();
+    });
+  } else {
+    showResult();
+  }
+}
+
+function prevQ() {
+  if (current > 0) {
+    fadeToNext(() => {
+      current--;
+      renderQuestion();
+    });
+  }
+}
+
+
+
+// ===== タイブレーク分離質問 =====
+const TIEBREAK_QUESTIONS = {
+  'observer-architect': {
+    pair: ['observer', 'architect'],
+    questions: [
+      {
+        text: '複雑な問題に出会ったとき、最初に感じるのは？',
+        options: [
+          { label: 'この構造はどうなっているんだろう', type: 'observer' },
+          { label: 'これをどう整理すれば解決できるだろう', type: 'architect' }
+        ]
+      },
+      {
+        text: '会議で良い洞察が出たとき、あなたの反応は？',
+        options: [
+          { label: 'その洞察をさらに深掘りしたい', type: 'observer' },
+          { label: 'その洞察を使って次のアクションを決めたい', type: 'architect' }
+        ]
+      },
+      {
+        text: '情報を集めるのは？',
+        options: [
+          { label: '全体像を理解するため', type: 'observer' },
+          { label: '最適な判断を下すため', type: 'architect' }
+        ]
+      }
+    ]
+  },
+  'connector-weaver': {
+    pair: ['connector', 'weaver'],
+    questions: [
+      {
+        text: 'チームに新しいメンバーが入ったとき、気になるのは？',
+        options: [
+          { label: 'この人と既存メンバーの間にどんな可能性があるか', type: 'connector' },
+          { label: 'この人が孤立せず安心できているか', type: 'weaver' }
+        ]
+      },
+      {
+        text: '交流の場で、自然とやっていることは？',
+        options: [
+          { label: 'まだ話したことのない人同士を紹介する', type: 'connector' },
+          { label: '一人でいる人や居心地悪そうな人に声をかける', type: 'weaver' }
+        ]
+      },
+      {
+        text: '人間関係で一番嬉しい瞬間は？',
+        options: [
+          { label: '自分が引き合わせた人同士が意気投合したとき', type: 'connector' },
+          { label: '自分がいることで誰かが安心できていると感じたとき', type: 'weaver' }
+        ]
+      }
+    ]
+  },
+  'observer-explorer': {
+    pair: ['observer', 'explorer'],
+    questions: [
+      {
+        text: '興味深いテーマを見つけたとき、あなたの動き方は？',
+        options: [
+          { label: 'そのテーマを徹底的に掘り下げたい', type: 'observer' },
+          { label: 'そのテーマから派生する別の未知の領域にも手を伸ばしたい', type: 'explorer' }
+        ]
+      },
+      {
+        text: '新しい分野に触れたとき、エネルギーが湧くのは？',
+        options: [
+          { label: 'その分野の構造や法則が見え始めたとき', type: 'observer' },
+          { label: 'まだ何もわからない最初の瞬間', type: 'explorer' }
+        ]
+      },
+      {
+        text: '「もう十分わかった」と感じたとき、あなたは？',
+        options: [
+          { label: 'まだ見落としがないか確認したくなる', type: 'observer' },
+          { label: '次の未知の領域に移りたくなる', type: 'explorer' }
+        ]
+      }
+    ]
+  },
+  'guardian-architect': {
+    pair: ['guardian', 'architect'],
+    questions: [
+      {
+        text: '今のやり方に問題を感じたとき、最初に考えるのは？',
+        options: [
+          { label: '問題を最小限に抑えて今の仕組みを安定させたい', type: 'guardian' },
+          { label: '仕組み自体を設計し直した方がいい', type: 'architect' }
+        ]
+      },
+      {
+        text: 'チームのルールについて、あなたの考えに近いのは？',
+        options: [
+          { label: '一度決めたルールは簡単に変えるべきではない', type: 'guardian' },
+          { label: '状況に合わなくなったルールは積極的に更新すべき', type: 'architect' }
+        ]
+      },
+      {
+        text: 'リスクを察知したとき、自然な反応は？',
+        options: [
+          { label: '被害が出ないように守りを固める', type: 'guardian' },
+          { label: 'リスクの根本原因を分析して構造的に解決したい', type: 'architect' }
+        ]
+      }
+    ]
+  },
+  'storyteller-explorer': {
+    pair: ['storyteller', 'explorer'],
+    questions: [
+      {
+        text: '心が動く瞬間はどちらに近い？',
+        options: [
+          { label: '体験や感情を言葉にできたとき', type: 'storyteller' },
+          { label: 'まだ誰も知らないものに最初に触れたとき', type: 'explorer' }
+        ]
+      },
+      {
+        text: '旅先で印象的な景色に出会ったとき、自然にやることは？',
+        options: [
+          { label: 'この景色が持つ意味や物語を考える', type: 'storyteller' },
+          { label: 'もっと奥に何があるか見に行きたくなる', type: 'explorer' }
+        ]
+      },
+      {
+        text: '「自由」という言葉から連想するのは？',
+        options: [
+          { label: '自分の感じたことをそのまま表現できること', type: 'storyteller' },
+          { label: 'まだ決まっていない場所へ飛び込めること', type: 'explorer' }
+        ]
+      }
+    ]
+  },
+  'builder-guardian': {
+    pair: ['builder', 'guardian'],
+    questions: [
+      {
+        text: 'プロジェクトが完了したとき、まず感じるのは？',
+        options: [
+          { label: '形になった達成感', type: 'builder' },
+          { label: '無事に終わった安心感', type: 'guardian' }
+        ]
+      },
+      {
+        text: 'チームで自分が一番価値を出せていると感じるのは？',
+        options: [
+          { label: '誰も手をつけていなかったものを実際に作り上げたとき', type: 'builder' },
+          { label: '見落とされていたリスクを事前に防げたとき', type: 'guardian' }
+        ]
+      },
+      {
+        text: '仕事で「丁寧にやる」の意味に近いのは？',
+        options: [
+          { label: '完成度の高いものを妥協せずに仕上げること', type: 'builder' },
+          { label: '抜け漏れやリスクがない状態を確保すること', type: 'guardian' }
+        ]
+      }
+    ]
+  },
+  'storyteller-weaver': {
+    pair: ['storyteller', 'weaver'],
+    questions: [
+      {
+        text: '誰かが辛そうにしているとき、自然とやることは？',
+        options: [
+          { label: 'その人の気持ちを言葉にして伝え返す', type: 'storyteller' },
+          { label: 'そばにいて、安心できる空気を作る', type: 'weaver' }
+        ]
+      },
+      {
+        text: 'チームの雰囲気が良くなったとき、嬉しいのは？',
+        options: [
+          { label: '自分の言葉や表現がきっかけになったとき', type: 'storyteller' },
+          { label: '自分がいることで自然とそうなっていたとき', type: 'weaver' }
+        ]
+      },
+      {
+        text: '人との関わりで大切にしているのは？',
+        options: [
+          { label: '感じたことを正直に表現し合える関係', type: 'storyteller' },
+          { label: '言葉にしなくてもお互い安心できる関係', type: 'weaver' }
+        ]
+      }
+    ]
+  },
+  'builder-explorer': {
+    pair: ['builder', 'explorer'],
+    questions: [
+      {
+        text: '新しいプロジェクトで一番テンションが上がる瞬間は？',
+        options: [
+          { label: '手を動かし始めて、だんだん形になっていくとき', type: 'builder' },
+          { label: 'まだ何も決まっていない、可能性だけがあるとき', type: 'explorer' }
+        ]
+      },
+      {
+        text: '「動きながら考える」とき、意識が向いているのは？',
+        options: [
+          { label: '目の前のものをどう完成させるか', type: 'builder' },
+          { label: 'この先にまだ見えていない何かがあるんじゃないか', type: 'explorer' }
+        ]
+      },
+      {
+        text: 'やりかけのプロジェクトが複数あるとき、自然な反応は？',
+        options: [
+          { label: '一つずつ完成させたい、中途半端が気持ち悪い', type: 'builder' },
+          { label: '全部並行で触っている方がエネルギーが湧く', type: 'explorer' }
+        ]
+      }
+    ]
+  }
+};
+
+let tiebreakerScores = {};
+let tiebreakerAnswers = [];
+let tiebreakerQuestions = [];
+let tiebreakerIndex = 0;
+let pendingScores = {};
+
+function checkTiebreak(scores) {
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  const topScore = sorted[0][1];
+  const THRESHOLD = 3; // 3点以内で発動
+  const tied = sorted.filter(e => topScore - e[1] <= THRESHOLD).map(e => e[0]);
+  if (tied.length < 2) return null;
+
+  // 同点ペアに対応する分離質問があるか確認（上位2タイプのペアを優先）
+  const top2 = sorted.slice(0, 2).map(e => e[0]);
+  const pairKeys = Object.keys(TIEBREAK_QUESTIONS);
+  // まず上位2タイプのペアを探す
+  for (const key of pairKeys) {
+    const pair = TIEBREAK_QUESTIONS[key].pair;
+    if (pair.every(p => top2.includes(p))) return key;
+  }
+  // なければtied全体で探す
+  for (const key of pairKeys) {
+    const pair = TIEBREAK_QUESTIONS[key].pair;
+    if (pair.every(p => tied.includes(p))) return key;
+  }
+  return null;
+}
+
+function showTiebreaker(pairKey, scores) {
+  pendingScores = scores;
+  tiebreakerScores = {};
+  TIEBREAK_QUESTIONS[pairKey].pair.forEach(p => tiebreakerScores[p] = 0);
+  tiebreakerQuestions = TIEBREAK_QUESTIONS[pairKey].questions;
+  tiebreakerAnswers = [];
+  tiebreakerIndex = 0;
+  renderTiebreakerQuestion();
+  showScreen('tiebreaker');
+}
+
+function renderTiebreakerQuestion() {
+  const q = tiebreakerQuestions[tiebreakerIndex];
+  const total = tiebreakerQuestions.length;
+  document.getElementById('tbCounter').textContent = `${tiebreakerIndex + 1} / ${total}`;
+  document.getElementById('tbQuestion').textContent = q.text;
+  const opts = document.getElementById('tbOptions');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tb-option-btn';
+    btn.textContent = opt.label;
+    btn.onclick = () => {
+      tiebreakerScores[opt.type] = (tiebreakerScores[opt.type] || 0) + 1;
+      tiebreakerAnswers.push(i);
+      tiebreakerIndex++;
+      if (tiebreakerIndex < tiebreakerQuestions.length) {
+        renderTiebreakerQuestion();
+      } else {
+        // タイブレーク結果を反映して結果表示
+        const winner = Object.entries(tiebreakerScores).sort((a,b) => b[1]-a[1])[0][0];
+        pendingScores[winner] += 1; // 勝者に1点加算して決定
+        finishResult(pendingScores);
+      }
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function showResult() {
+  // Calculate scores
+  const scores = {};
+  TYPES.forEach(t => scores[t.id] = 0);
+
+  questions.forEach((q, i) => {
+    if (answers[i] !== null) {
+      scores[q.type] += answers[i]; // 0-4
+    }
+  });
+
+  // 同点チェック
+  const pairKey = checkTiebreak(scores);
+  if (pairKey) {
+    showTiebreaker(pairKey, scores);
+    return;
+  }
+
+  finishResult(scores);
+}
+
+function finishResult(scores) {
+
+  // Max possible per type = 4 * 4 = 16
+  const maxScore = 16;
+  const winner = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  const type = TYPES.find(t => t.id === winner);
+
+  document.documentElement.style.setProperty('--type-color', type.color);
+  window._resultType = type;
+  renderPrompts(type);
+  drawCycleMap(type);
+  renderBaton(type);
+  const emojiEl = document.getElementById('shareEmoji');
+  if (emojiEl) emojiEl.innerHTML = `<span style="font-size:2em;line-height:1;">${type.animal}</span>`;
+
+  document.getElementById('rInitial').textContent = type.name.substring(0,2);
+  document.getElementById('rAnimal').innerHTML = type.animalImage
+    ? `<img src="${type.animalImage}" style="height:1em;width:1em;object-fit:contain;image-rendering:pixelated;">`
+    : `<span style="font-size:1em;">${type.animal}</span>`;
+  document.getElementById('rAnimalName').textContent = type.animalName;
+  document.getElementById('rType').textContent = type.name;
+  document.getElementById('rSubtitle').textContent = type.subtitle;
+  const catchEl = document.getElementById('rCatchcopy');
+  if (catchEl) catchEl.textContent = CATCHCOPY[type.id] || '';
+  // 透かし文字用
+  document.querySelector('.result-card').setAttribute('data-animal', type.animalName);
+  const rawDesc = type.desc;
+  const formattedDesc = rawDesc.replace(/【(.+?)】/g, '<span class="desc-heading">$1</span>');
+  document.getElementById('rDesc').innerHTML = formattedDesc;
+
+  // Score bars
+  const barsEl = document.getElementById('scoresBars');
+  document.querySelector('.scores-section').style.display = '';
+  barsEl.innerHTML = '';
+  const sorted = [...TYPES].sort((a,b) => scores[b.id] - scores[a.id]);
+  sorted.forEach(t => {
+    const pct = Math.round((scores[t.id] / maxScore) * 100);
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    row.innerHTML = `
+      <span class="score-animal" style="font-size:24px;line-height:1;">${t.animalImage ? `<img src="${t.animalImage}" style="width:24px;height:24px;object-fit:contain;image-rendering:pixelated;">` : t.animal}</span>
+      <span class="score-name">${t.name}</span>
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" style="width:0%;background:${t.color}" data-w="${pct}"></div>
+      </div>
+      <span class="score-val">${pct}%</span>`;
+    barsEl.appendChild(row);
+  });
+
+  showScreen('result');
+
+  // 診断結果をSupabaseに保存
+  saveDiagnosis(type.id);
+
+  // アンケートをリセット表示
+  const surveyEl = document.getElementById('surveyForm');
+  if (surveyEl) {
+    surveyEl.style.display = '';
+    surveyEl.querySelectorAll('.survey-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('surveyAgeGroup').value = '';
+    document.getElementById('surveyGender').value = '';
+    document.getElementById('surveyDone').style.display = 'none';
+  }
+
+  // URLにタイプを反映
+  try { history.replaceState(null, '', `?type=${type.id}`); } catch(e) {}
+
+  // Draw share card
+  drawShareCard(type);
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 200);
+}
+
+
+
+
+
+const BATON_DATA = {
+  explorer: {
+    intro: 'あなたは「発見」フェーズで輝きます。未知に飛び込み可能性を広げた後、理解・設計・実行のフェーズでエネルギーが落ちやすくなります。そこをバトンタッチできる相手がいると、プロジェクトは止まりません。',
+    partners: [
+      { id: 'observer',   phase: '理解フェーズ', desc: 'あなたが発見したものを深く分析し、構造として理解してくれます。「なぜこれが面白いのか」を言語化してくれる存在。' },
+      { id: 'architect', phase: '方向フェーズ', desc: 'あなたの発見を受け取り、どこへ向かうべきかを設計してくれます。探索が終わった後の羅針盤になってくれます。' },
+      { id: 'builder',    phase: '実行フェーズ', desc: 'あなたが飽きてきた頃に「作る」を引き受けてくれます。アイデアを現実の形にする力があります。' },
+    ]
+  },
+  observer: {
+    intro: 'あなたは「理解」フェーズで輝きます。構造を深く把握した後、人を動かす・形にする・広めるフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'architect', phase: '方向フェーズ', desc: 'あなたの分析を受け取り、具体的な戦略に変換してくれます。理解を行動につなげてくれる橋渡し役。' },
+      { id: 'builder',    phase: '実行フェーズ', desc: 'あなたが理解したことを実際に形にしてくれます。分析が終わった後の「作る」を引き受けてくれます。' },
+      { id: 'connector',  phase: '拡散フェーズ', desc: 'あなたの洞察を必要な人に届けてくれます。あなたが苦手な「人を動かす」を自然にやってくれます。' },
+    ]
+  },
+  architect: {
+    intro: 'あなたは「方向を決める」フェーズで輝きます。戦略を描いた後、手を動かす・広める・安定させるフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'builder',   phase: '実行フェーズ', desc: 'あなたの戦略を受け取り、実際に形にしてくれます。「どうやって作るか」を任せられる存在。' },
+      { id: 'connector', phase: '拡散フェーズ', desc: '戦略を人に伝え、必要な協力者を集めてくれます。あなたの設計を社会につなぐ役割。' },
+      { id: 'guardian',  phase: '安定フェーズ', desc: 'あなたが次の戦略に移りたくなった後も、仕組みを維持し続けてくれます。' },
+    ]
+  },
+  builder: {
+    intro: 'あなたは「作る」フェーズで輝きます。形にした後、広める・安定させる・次の発見へ向かうフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'connector', phase: '拡散フェーズ', desc: 'あなたが作ったものを必要な人に届けてくれます。作った後の「広める」を自然にやってくれます。' },
+      { id: 'storyteller',   phase: '表現フェーズ', desc: 'あなたの作ったものをより魅力的に見せ、世界に広めてくれます。' },
+      { id: 'guardian',  phase: '安定フェーズ', desc: 'あなたが次のものを作りたくなった後も、完成したものを守り続けてくれます。' },
+    ]
+  },
+  connector: {
+    intro: 'あなたは「人を集める」フェーズで輝きます。人をつないだ後、形にする・安定させる・深く分析するフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'storyteller',   phase: '表現フェーズ', desc: 'あなたが集めた人や素材を使って、魅力的なものを生み出してくれます。' },
+      { id: 'builder',   phase: '実行フェーズ', desc: 'あなたがつないだ人たちの力を形にしてくれます。コネクションを実体に変える存在。' },
+      { id: 'weaver', phase: 'サポートフェーズ', desc: 'あなたが集めたチームの一人ひとりを支え、チームを機能させ続けてくれます。' },
+    ]
+  },
+  storyteller: {
+    intro: 'あなたは「広める」フェーズで輝きます。表現し世界に届けた後、安定させる・支え続ける・深く分析するフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'guardian',  phase: '安定フェーズ', desc: 'あなたが生み出したものを長く守り続けてくれます。次の創造に集中できる環境を作ってくれます。' },
+      { id: 'weaver', phase: 'サポートフェーズ', desc: 'あなたの作品やプロジェクトを支え、関わる人をケアしてくれます。' },
+      { id: 'observer',  phase: '分析フェーズ', desc: 'あなたの表現が世界にどう届いているかを分析し、次の創造のヒントを与えてくれます。' },
+    ]
+  },
+  guardian: {
+    intro: 'あなたは「安定させる」フェーズで輝きます。仕組みを守った後、新しいことを探す・アイデアを生む・広めるフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'explorer',  phase: '発見フェーズ', shareLight: true, desc: 'あなたが守り続けている間に、次の可能性を探してきてくれます。停滞を防ぐ刺激をもたらします。' },
+      { id: 'storyteller',   phase: '表現フェーズ', desc: '安定した基盤の上で、新しい表現を生み出してくれます。あなたの守りがあるから動ける存在。' },
+      { id: 'connector', phase: '拡散フェーズ', desc: 'あなたが守るものを外の世界につなぎ、より広く届けてくれます。' },
+    ]
+  },
+  weaver: {
+    intro: 'あなたは「支える」フェーズで輝きます。チームを支えた後、新しいことを発見する・戦略を描く・形にするフェーズでエネルギーが落ちやすくなります。',
+    partners: [
+      { id: 'explorer',   phase: '発見フェーズ', shareLight: true, desc: 'あなたが支えるチームに、新しい方向性と刺激をもたらしてくれます。' },
+      { id: 'architect', phase: '方向フェーズ', desc: 'あなたが支えてきたものを次のステージへ導く戦略を描いてくれます。' },
+      { id: 'builder',    phase: '実行フェーズ', desc: 'あなたのサポートを受けて実際に形にしてくれます。支えた努力を可視化してくれる存在。' },
+    ]
+  }
+};
+
+function renderBaton(type) {
+  const data = BATON_DATA[type.id];
+  if (!data) return;
+
+  document.getElementById('batonIntro').textContent = data.intro;
+
+  const cards = document.getElementById('batonCards');
+  cards.innerHTML = '';
+
+  data.partners.forEach(p => {
+    const t = TYPES.find(t => t.id === p.id);
+    if (!t) return;
+    const card = document.createElement('div');
+    card.className = 'baton-card';
+    card.style.setProperty('--baton-color', t.color);
+    card.innerHTML = `
+      <div class="baton-animal" style="font-size:40px;line-height:1;">${t.animalImage ? `<img src="${t.animalImage}" style="width:40px;height:40px;object-fit:contain;image-rendering:pixelated;">` : t.animal}</div>
+      <div class="baton-info">
+        <div class="baton-type-name">${t.name} <span style="font-size:10px;opacity:0.5;">${t.subtitle}</span></div>
+        <div class="baton-phase" style="color:${t.color}">${p.phase}</div>
+        <div class="baton-desc">${p.desc}</div>
+      </div>`;
+    cards.appendChild(card);
+  });
+}
+
+const CYCLE_ORDER = [
+  { id: 'explorer',    label: 'Explorer',    animalName: 'タコ',     animal: '🐙', animalImage: 'assets/icons/explorer.png',    phase: '発見',        shareLight: true, color: '#8E7CC3' },
+  { id: 'observer',    label: 'Observer',    animalName: 'フクロウ', animal: '🦉', animalImage: 'assets/icons/observer.png',    phase: '理解',                          color: '#4a6cf7' },
+  { id: 'architect',   label: 'Architect',   animalName: 'キツネ',  animal: '🦊', animalImage: 'assets/icons/architect.png',   phase: '方向を決める',                   color: '#C1121F' },
+  { id: 'builder',     label: 'Builder',     animalName: 'ビーバー', animal: '🦫', animalImage: 'assets/icons/builder.png',     phase: '作る',                          color: '#F57C00' },
+  { id: 'connector',   label: 'Connector',   animalName: 'ハチ',    animal: '🐝', animalImage: 'assets/icons/connector.png',   phase: '人を集める',                     color: '#F4B400' },
+  { id: 'storyteller', label: 'Storyteller', animalName: 'クジャク', animal: '🦚', animalImage: 'assets/icons/storyteller.png', phase: '広める',                        color: '#C2185B' },
+  { id: 'guardian',    label: 'Guardian',    animalName: 'ゾウ',    animal: '🐘', animalImage: 'assets/icons/guardian.png',    phase: '安定させる',                     color: '#2E9E5E' },
+  { id: 'weaver',      label: 'Weaver',      animalName: 'イルカ',  animal: '🐬', animalImage: 'assets/icons/weaver.png',      phase: '支える',                        color: '#00ACC1' },
+];
+
+function drawCycleMap(type) {
+  const svg = document.getElementById('cycleSvg');
+  svg.innerHTML = '';
+
+  const cx = 280, cy = 280, R = 190, r = 48;
+  const n = CYCLE_ORDER.length;
+  const myIndex = CYCLE_ORDER.findIndex(t => t.id === type.id);
+
+  // 輝くゾーン：自分と前後1つずつ（計3フェーズ）
+  const glowIndexes = [
+    myIndex,
+    (myIndex + 1) % n,
+    (myIndex - 1 + n) % n
+  ];
+
+  // 薄い円弧の背景トラック
+  const track = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  track.setAttribute('cx', cx); track.setAttribute('cy', cy);
+  track.setAttribute('r', R);
+  track.setAttribute('fill', 'none');
+  track.setAttribute('stroke', 'rgba(255,255,255,0.05)');
+  track.setAttribute('stroke-width', '40');
+  svg.appendChild(track);
+
+  // 矢印マーカー
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `<marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.2)"/>
+  </marker>`;
+  svg.appendChild(defs);
+
+  CYCLE_ORDER.forEach((t, i) => {
+    const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+    const x = cx + R * Math.cos(angle);
+    const y = cy + R * Math.sin(angle);
+    const isMe = i === myIndex;
+    const isGlow = glowIndexes.includes(i);
+
+    // 接続線（次のノードへ）
+    const nextAngle = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
+    const nx = cx + R * Math.cos(nextAngle);
+    const ny = cy + R * Math.sin(nextAngle);
+    const midAngle = angle + Math.PI / n;
+    const mx = cx + (R + 2) * Math.cos(midAngle);
+    const my = cy + (R + 2) * Math.sin(midAngle);
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M${x},${y} Q${mx},${my} ${nx},${ny}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'rgba(255,255,255,0.07)');
+    path.setAttribute('stroke-width', '1.5');
+    svg.appendChild(path);
+
+    // ノード背景円
+    const nodeBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    nodeBg.setAttribute('cx', x); nodeBg.setAttribute('cy', y);
+    nodeBg.setAttribute('r', isMe ? 34 : 26);
+    if (isMe) {
+      nodeBg.setAttribute('fill', 'rgba(0,0,0,0.3)');
+      nodeBg.setAttribute('stroke', t.color);
+      nodeBg.setAttribute('stroke-width', '2.5');
+      nodeBg.setAttribute('filter', `drop-shadow(0 0 8px ${t.color})`);
+    } else {
+      nodeBg.setAttribute('fill', 'rgba(255,255,255,0.02)');
+      nodeBg.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+      nodeBg.setAttribute('stroke-width', '1');
+    }
+    svg.appendChild(nodeBg);
+
+    // アイコン画像
+    const iconSize = isMe ? 36 : 28;
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    icon.setAttribute('href', t.animalImage || t.animal);
+    icon.setAttribute('x', x - iconSize/2);
+    icon.setAttribute('y', y - iconSize/2);
+    icon.setAttribute('width', iconSize);
+    icon.setAttribute('height', iconSize);
+    svg.appendChild(icon);
+
+    // 動物名（アイコンの下）
+    const nodeR = isMe ? 34 : 26;
+    const animalLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    animalLbl.setAttribute('x', x);
+    animalLbl.setAttribute('y', y + nodeR + 16);
+    animalLbl.setAttribute('text-anchor', 'middle');
+    animalLbl.setAttribute('dominant-baseline', 'middle');
+    animalLbl.setAttribute('font-size', isMe ? '17' : '15');
+    animalLbl.setAttribute('font-family', 'Noto Sans JP, sans-serif');
+    animalLbl.setAttribute('fill', isMe ? t.color : '#fff');
+    animalLbl.setAttribute('opacity', isMe ? '0.9' : '0.35');
+    animalLbl.textContent = t.animalName;
+    svg.appendChild(animalLbl);
+    const phaseX = x;
+    const phaseY = y - nodeR - 16;
+
+    const phaseLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    phaseLbl.setAttribute('x', phaseX);
+    phaseLbl.setAttribute('y', phaseY);
+    phaseLbl.setAttribute('text-anchor', 'middle');
+    phaseLbl.setAttribute('dominant-baseline', 'middle');
+    phaseLbl.setAttribute('font-size', isMe ? '20' : '16');
+    phaseLbl.setAttribute('font-family', 'Noto Sans JP, sans-serif');
+    phaseLbl.setAttribute('fill', '#fff');
+    phaseLbl.setAttribute('font-weight', isMe ? '700' : '400');
+    phaseLbl.setAttribute('opacity', isMe ? '1' : '0.5');
+    phaseLbl.textContent = t.phase;
+    svg.appendChild(phaseLbl);
+  });
+
+  // 中央テキスト
+  const centerLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerLabel.setAttribute('x', cx); centerLabel.setAttribute('y', cy - 20);
+  centerLabel.setAttribute('text-anchor', 'middle');
+  centerLabel.setAttribute('font-size', '30');
+  centerLabel.setAttribute('font-weight', '700');
+  centerLabel.setAttribute('font-family', 'Space Grotesk, sans-serif');
+  centerLabel.setAttribute('fill', '#fff');
+  centerLabel.textContent = 'PROJECT';
+  svg.appendChild(centerLabel);
+
+  const centerLabel2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  centerLabel2.setAttribute('x', cx); centerLabel2.setAttribute('y', cy + 22);
+  centerLabel2.setAttribute('text-anchor', 'middle');
+  centerLabel2.setAttribute('font-size', '30');
+  centerLabel2.setAttribute('font-weight', '700');
+  centerLabel2.setAttribute('font-family', 'Space Grotesk, sans-serif');
+  centerLabel2.setAttribute('fill', '#fff');
+  centerLabel2.textContent = 'CYCLE';
+  svg.appendChild(centerLabel2);
+
+  // サブタイトル
+  const phaseLabel = CYCLE_ORDER[myIndex].phase;
+  const prevPhase = CYCLE_ORDER[(myIndex - 1 + n) % n].phase;
+  const nextPhase = CYCLE_ORDER[(myIndex + 1) % n].phase;
+  document.getElementById('cycleSubtitle').textContent =
+    `あなたは「${phaseLabel}」フェーズで最も輝きます。「${prevPhase}」〜「${nextPhase}」のタイミングにエネルギーのピークがきます。他のフェーズでモチベーションが落ちても、それはあなたのせいではありません。`;
+}
+
+const PROMPTS = {
+  observer: {
+    intro: 'あなたは Observer です。構造を観察し、理解することに喜びを感じますが、途中段階でモチベーションが落ちやすいという特性があります。AIをチームメンバーとして活用することで、その特性を補えます。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はObserverタイプ——物事の構造やパターンを読み解くことに喜びを感じますが、
+「全体像が見えない中盤」でエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：個人ブログのリニューアル／副業のサービス設計 など）
+
+【今いる場所】
+（例：方向性は決まったが、具体的な作業に入ったばかり）
+
+【今感じていること】
+（例：何から手をつければいいか分からず止まっている）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. このプロジェクトの「現在地」を構造マップとして言語化する
+   （どのフェーズにいて、残りに何があるかを整理）
+
+2. 今の段階だからこそ観察・分析できる面白いポイントを2〜3個挙げる
+   （Observerの視点が最も活きる部分を見せてください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （作業ではなく、観察や整理でも構いません）
+
+私はゴールが見えると動けます。全体構造を示しながら、今日の小さな前進を一緒に見つけてください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはObserver。
+得意なこと：構造を読む、パターンを見つける、深く理解する
+苦手なこと：分析を「行動」に変える、人に届ける形にする、長期の絵を描く
+
+---
+
+今日のタスク：
+（例：サービスのターゲット設計を終わらせたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Builder（実行役）として：**
+私の分析・観察をもとに、今日中に完了できる具体的なアクションリストを作る。
+「考える」ではなく「手が動く」レベルまで分解してください。
+
+**Architect（設計役）として：**
+このタスクが全体のどこに位置するかを示す。
+今日やることが、1ヶ月後・3ヶ月後にどうつながるかを一言で見せてください。
+
+**Connector（届ける役）として：**
+この成果を誰かに見せる・共有するとしたら、どんな形が一番伝わるかを提案する。
+一人で抱えず、外に出す最初の一手を教えてください。
+
+---
+
+Observerの私が「分析で終わらず、動ける」ようにサポートしてください。`
+  },
+  architect: {
+    intro: 'あなたは Architect です。戦略を描き、全体を設計する力が強みですが、細部の実行や人の感情面を補う役割があると、設計が現実に動き出しやすくなります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はArchitectタイプ——全体を設計し、最適な戦略を描くことに喜びを感じますが、
+「不確実性が高く、正解が見えない状況」でエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：新サービスのビジネスモデル設計／チームの仕組みづくり など）
+
+【今いる場所】
+（例：方向性は複数あるが、どれを選ぶべきか迷っている）
+
+【今感じていること】
+（例：情報が足りず、判断を先送りにしている）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. 現在の不確実性を整理し、「今決められること」と「まだ決めなくていいこと」を分類する
+
+2. 今取れる戦略オプションを2〜3個、それぞれのリスクと可能性とともに提示する
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （完璧な判断より、前進できる最初の一手を教えてください）
+
+私は全体像が見えると動けます。不確実な状況でも「次の一手」を一緒に見つけてください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはArchitect。
+得意なこと：全体を設計する、戦略を描く、優先順位を整理する
+苦手なこと：細部まで手を動かす、人の感情に寄り添う、ゼロからアイデアを生む
+
+---
+
+今日のタスク：
+（例：プロジェクトの次のフェーズ計画を固めたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Builder（実行役）として：**
+私の設計・戦略をもとに、今日中に完了できる具体的なアクションリストを作る。
+「考える」ではなく「手が動く」レベルまで分解してください。
+
+**Weaver（感情役）として：**
+このプロジェクトに関わる人たちの気持ちや懸念を想像し、巻き込むための言葉や配慮を提案する。
+論理だけでは動かない人を動かすための視点を教えてください。
+
+**Storyteller（表現役）として：**
+この戦略や計画を、誰かに伝えるとしたら何がいちばん刺さるかを提案する。
+「正しさ」より「伝わる」形にする最初の一手を教えてください。
+
+---
+
+Architectの私が「設計で終わらず、動かせる」ようにサポートしてください。`
+  },
+  connector: {
+    intro: 'あなたは Connector です。人と人をつなぎ、関係性を生み出す力が強みですが、一人で深く集中する作業や全体構造の設計を補う役割があると、つながりが成果に変わりやすくなります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はConnectorタイプ——人と人をつなぎ、関係性の中に可能性を見出すことに喜びを感じますが、
+「一人でコツコツ進める作業」や「誰の反応もない孤独な時間」でエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：コミュニティ運営／イベント企画／人をつなぐサービスの設計 など）
+
+【今いる場所】
+（例：アイデアはあるが、一人で作業を進める段階で止まっている）
+
+【今感じていること】
+（例：誰にも見せていないので、やる意味が見えなくなってきた）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. この作業が「誰かのためになっている」文脈を具体的に言語化する
+   （誰が、どう喜ぶのかをリアルに描いてください）
+
+2. 今の孤独な作業フェーズを乗り越えるための「小さなつながり」を2〜3個提案する
+   （一人でやりきらなくていい方法を見せてください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （誰かに見せる・共有する・反応をもらう、でも構いません）
+
+私は誰かの顔が見えると動けます。この作業の先にいる人を一緒に想像してください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはConnector。
+得意なこと：人と人をつなぐ、関係性を作る、場の空気を読む
+苦手なこと：一人で深く分析する、全体構造を設計する、長期計画を立てる
+
+---
+
+今日のタスク：
+（例：サービスのターゲットと届け方を整理したい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Observer（分析役）として：**
+私がつなごうとしている人たちの構造やパターンを分析する。
+「誰と誰が、なぜつながると価値が生まれるのか」を整理してください。
+
+**Architect（設計役）として：**
+このタスクが全体のどこに位置するかを示す。
+今日やることが、1ヶ月後・3ヶ月後にどうつながるかを一言で見せてください。
+
+**Builder（実行役）として：**
+今日中に完了できる具体的なアクションリストを作る。
+「考える」ではなく「手が動く」レベルまで分解してください。
+
+---
+
+Connectorの私が「人を動かすだけでなく、自分も動ける」ようにサポートしてください。`
+  },
+  storyteller: {
+    intro: 'あなたは Storyteller です。アイデアを生み出し、世界に意味を与える力が強みですが、それを形にする実行力や、継続する仕組みを補う役割があると、表現が現実に届きやすくなります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はStoryttellerタイプ——新しいアイデアや表現を生み出すことに喜びを感じますが、
+「アイデアを実用的な形に落とし込む作業」や「同じことの繰り返し」でエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：ブログ・SNS発信／クリエイティブな副業／コンテンツ制作 など）
+
+【今いる場所】
+（例：アイデアはたくさんあるが、どれも中途半端で完成していない）
+
+【今感じていること】
+（例：作業が単調になってきて、ワクワクを感じられなくなってきた）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. 私のアイデアの「独自性と面白さ」を言語化する
+   （私が気づいていない価値を外から見て教えてください）
+
+2. このプロジェクトの中に残っている「まだ表現できていない面白い部分」を2〜3個見つける
+   （Storyttellerの創造性が再点火できるポイントを探してください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （完成より、表現の楽しさを取り戻す一手を教えてください）
+
+私はワクワクが戻ると動けます。アイデアの火を一緒に再点火してください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはStoryteller。
+得意なこと：アイデアを生む、表現する、意味を与える
+苦手なこと：アイデアを最後まで形にする、仕組みを守り続ける、全体戦略を立てる
+
+---
+
+今日のタスク：
+（例：作りかけのコンテンツを一つ完成させたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Builder（実行役）として：**
+私のアイデア・表現をもとに、今日中に完了できる具体的なアクションリストを作る。
+「考える」ではなく「手が動く」レベルまで分解してください。
+
+**Guardian（継続役）として：**
+このプロジェクトを長く続けるための最小限の仕組みを提案する。
+モチベーションが落ちたときでも続けられる「型」を教えてください。
+
+**Architect（設計役）として：**
+このタスクが全体のどこに位置するかを示す。
+今日やることが、1ヶ月後・3ヶ月後にどうつながるかを一言で見せてください。
+
+---
+
+Storyttellerの私が「表現するだけでなく、届けて完成させられる」ようにサポートしてください。`
+  },
+  builder: {
+    intro: 'あなたは Builder です。手を動かして形にする力が強みですが、方向性の設計や、完成したものを届ける役割を補うと、作ったものが最大限に活きるようになります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はBuilderタイプ——実際に作り、形にしていくプロセスに喜びを感じますが、
+「何を作るべきか方向性が曖昧なとき」や「終わりが見えないとき」にエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：アプリ開発／プロダクト制作／サービスの実装 など）
+
+【今いる場所】
+（例：作業は進んでいるが、これで合っているのか確信が持てない）
+
+【今感じていること】
+（例：ゴールが見えず、どこまでやれば「完成」なのかわからない）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. 「今日完成できる小さな形」を一つ定義する
+   （曖昧なゴールを、今日達成できるサイズに分解してください）
+
+2. その完成が全体のどこに位置するかを示す
+   （今日の作業が最終ゴールとどうつながっているかを見せてください）
+
+3. 今日動くための具体的なタスクリストを作る
+   （「考える」ではなく「手が動く」レベルまで分解してください）
+
+私は「今日何を完成させるか」が見えると動けます。今日の小さな完成を一緒に定義してください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはBuilder。
+得意なこと：実際に作る、形にする、手を動かし続ける
+苦手なこと：何を作るべきかを設計する、作ったものを人に届ける、大きな方向性を描く
+
+---
+
+今日のタスク：
+（例：機能の実装を進めたい／デザインを仕上げたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Observer（分析役）として：**
+私が今作ろうとしているものの目的と全体構造を整理する。
+「何のために作るのか」「誰のために作るのか」を明確にしてください。
+
+**Architect（設計役）として：**
+このタスクが全体のどこに位置するかを示す。
+今日やることが、1ヶ月後・3ヶ月後にどうつながるかを一言で見せてください。
+
+**Connector（届け役）として：**
+完成したものを誰にどう届けるかを提案する。
+一人で抱えず、外に出す最初の一手を教えてください。
+
+---
+
+Builderの私が「作るだけでなく、正しいものを正しく届けられる」ようにサポートしてください。`
+  },
+  guardian: {
+    intro: 'あなたは Guardian です。守り、安定させる責任感が強みですが、新しいアイデアの発想や変化への対応を補う役割があると、安定の上にさらなる可能性が広がります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はGuardianタイプ——仕組みや環境を守り、安定させることに使命感を感じますが、
+「変化が激しく正解がない状況」や「リスクが読めない判断」が続くときにエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：運営中のサービス改善／チームの仕組みづくり／継続的なコンテンツ管理 など）
+
+【今いる場所】
+（例：現状維持はできているが、次の一手が踏み出せない）
+
+【今感じていること】
+（例：変化が怖くて、動くことでかえって壊してしまいそうで不安）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. 現状のリスクを整理し、「守るべきもの」と「変えてよいもの」を分類する
+
+2. 安定を保ちながら前に進むための「最も安全な次の一手」を提示する
+   （壊さずに、少しだけ変えられる部分を見つけてください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （大きな変化ではなく、今日できる小さな改善で構いません）
+
+私は「壊れないことが確認できると」動けます。安全な前進を一緒に見つけてください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはGuardian。
+得意なこと：守る、安定させる、継続する、リスクを察知する
+苦手なこと：新しいアイデアを生む、変化を主導する、人を積極的に巻き込む
+
+---
+
+今日のタスク：
+（例：現在の仕組みを改善しながら、新しい取り組みも始めたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Explorer（挑戦役）として：**
+既存の仕組みを壊さずに試せる「小さな実験」を提案する。
+リスクを最小化しながら新しい可能性を探る方法を教えてください。
+
+**Storyteller（表現役）として：**
+このプロジェクトの新しい可能性や面白さを言語化する。
+Guardianの私がワクワクできる「変化の意味」を見せてください。
+
+**Connector（巻き込み役）として：**
+この取り組みを誰かと一緒に進めるとしたら、どんな人をどう巻き込むかを提案する。
+一人で抱えずに進める最初の一手を教えてください。
+
+---
+
+Guardianの私が「守りながら、少しだけ前に進める」ようにサポートしてください。`
+  },
+  explorer: {
+    intro: 'あなたは Explorer です。未知に踏み込む好奇心と行動力が強みですが、継続する仕組みや人への配慮を補う役割があると、探索が確かな成果につながりやすくなります。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はExplorerタイプ——未知の領域に踏み込み、新しいことを試すことに喜びを感じますが、
+「同じことの繰り返し」や「細かい管理・継続作業」が続くときにエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：新しいビジネスの実験／未知の領域への挑戦／プロトタイプ開発 など）
+
+【今いる場所】
+（例：最初の熱量は高かったが、作業が単調になってきた）
+
+【今感じていること】
+（例：このプロジェクト自体に飽きてきて、新しいことがしたくなっている）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. このプロジェクトの中に残っている「まだ誰もやっていないこと」「試せる新しい角度」を見つける
+   （Explorerの探索心が再点火できるポイントを探してください）
+
+2. 退屈に感じている部分を最小化・自動化・委任できる方法を提案する
+   （やりたくない作業から解放されるための一手を教えてください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （新しい実験・検証・試行で構いません）
+
+私は「新しい問い」があると動けます。このプロジェクトに残っている未開拓の可能性を一緒に見つけてください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはExplorer。
+得意なこと：新しいことを試す、未知に踏み込む、可能性を見つける
+苦手なこと：安定した仕組みを守る、最後まで形にする、人の感情に寄り添う
+
+---
+
+今日のタスク：
+（例：試していることを整理して、次のステップを決めたい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Guardian（継続役）として：**
+私が試していることを持続可能な形にまとめる。
+熱量が落ちてもつづけられる最小限の仕組みを作ってください。
+
+**Builder（実行役）として：**
+今日中に完了できる具体的なアクションリストを作る。
+探索を「形」に変えるための手が動くステップを教えてください。
+
+**Weaver（配慮役）として：**
+この取り組みが関わる人にどんな影響を与えるかを整理する。
+人への影響を考慮した着地プランを提案してください。
+
+---
+
+Explorerの私が「試すだけでなく、着地させられる」ようにサポートしてください。`
+  },
+  weaver: {
+    intro: 'あなたは Weaver です。人を支え、場の調和を生み出す力が強みですが、自分の意見を主張する力や戦略的な判断を補う役割があると、支えることが自分の力にもなっていきます。',
+    motivation: `あなたは私の個人プロジェクトの進行パートナーです。
+私はWeaverタイプ——人の役に立つことや、誰かが成功するのを支えることに喜びを感じますが、
+「自分が主役になる場面」や「明確な評価がない状況」でエネルギーが急激に落ちる傾向があります。
+
+【プロジェクト概要】
+（例：チームサポート／コミュニティ運営／誰かのための仕組みづくり など）
+
+【今いる場所】
+（例：サポートはしているが、自分の貢献が見えにくい状態）
+
+【今感じていること】
+（例：頑張っているのに誰にも気づかれず、このまま続けていいのか迷っている）
+
+---
+
+上記を踏まえて、以下を順番にやってください。
+
+1. 私が今やっていることの「誰かへの貢献」を具体的に言語化する
+   （見えにくい貢献を、見える形で示してください）
+
+2. サポート役に留まらず、自分の意見や価値を出してもいい場面を2〜3個見つける
+   （Weaverが「自分のために」動ける瞬間を探してください）
+
+3. 「今日一つだけ動くとしたら何か」を具体的に提案する
+   （誰かのためだけでなく、自分のための一手でも構いません）
+
+私は「貢献が見える」と動けます。自分がやっていることの価値を一緒に言語化してください。`,
+    team: `あなたは私の「バーチャルチーム」です。
+一人で進めているプロジェクトで、私にはできないことを補ってください。
+
+私のタイプはWeaver。
+得意なこと：人を支える、場を整える、誰も取り残さない
+苦手なこと：自分の意見を主張する、全体構造を設計する、未来の戦略を描く
+
+---
+
+今日のタスク：
+（例：支えているプロジェクトの方向性を整理したい）
+
+---
+
+このタスクに対して、以下の3つの役割として動いてください。
+
+**Observer（分析役）として：**
+私が支えているプロジェクトの全体構造とパターンを整理する。
+「何がうまくいっていて、何が機能していないか」を客観的に示してください。
+
+**Architect（戦略役）として：**
+このプロジェクトの今後の方向性と、Weaverである私が担うべき役割を提案する。
+サポートしながら、自分の価値を最大化できる立ち位置を教えてください。
+
+**Storyteller（表現役）として：**
+私がやっていることの意味や価値を、誰かに伝えるための言葉にする。
+自分の貢献を自分で語れるようになるための表現を提案してください。
+
+---
+
+Weaverの私が「支えながら、自分も前に進める」ようにサポートしてください。`
+  }
+};
+
+function renderPrompts(type) {
+  const p = PROMPTS[type.id];
+  if (!p) return;
+  document.getElementById('promptIntro').textContent = p.intro;
+  document.getElementById('promptText1').textContent = p.motivation;
+  document.getElementById('promptText2').textContent = p.team;
+}
+
+function copyPrompt(num) {
+  const text = document.getElementById('promptText' + num).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelectorAll('.prompt-copy-btn')[num - 1];
+    btn.classList.add('done');
+    btn.textContent = '✓ コピーしました';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = '📋 コピー'; }, 2000);
+  });
+}
+
+function drawShareCard(type) {
+  const card = document.getElementById('shareCardHtml');
+  if (!card) return;
+  // 背景色
+  card.style.background = type.shareLight ? '#f0efe9' : '#05050f';
+  // グロー
+  const glow = document.getElementById('shareCardGlow');
+  if (glow) glow.style.background = type.color;
+  // アイコン
+  const icon = document.getElementById('shareCardIcon');
+  if (icon) icon.src = type.animalImage || '';
+  // テキスト
+  const initial = document.getElementById('shareCardInitial');
+  if (initial) { initial.textContent = type.name.substring(0,2); initial.style.color = type.color; }
+  const name = document.getElementById('shareCardName');
+  if (name) name.textContent = type.name;
+  const subtitle = document.getElementById('shareCardSubtitle');
+  if (subtitle) subtitle.textContent = type.subtitle;
+  const catchcopy = document.getElementById('shareCardCatchcopy');
+  if (catchcopy) catchcopy.textContent = CATCHCOPY[type.id] || '';
+  // ライトカードの場合文字色を変える
+  if (type.shareLight) {
+    [name, subtitle, catchcopy].forEach(el => { if (el) el.style.color = ''; });
+    name && (name.style.color = '#1a1a1a');
+  }
+}
+function isKiriban(n) {
+  // キリ番（100の倍数）
+  if (n >= 100 && n % 100 === 0) return true;
+  // ゾロ目（1・11・111・1111...、2・22・222...など）
+  const s = String(n);
+  if (s.length >= 2 && s.split('').every(c => c === s[0])) return true;
+  return false;
+}
+
+function getKiribanMsg(n) {
+  const s = String(n);
+  if (s.length >= 2 && s.split('').every(c => c === s[0])) {
+    return `ゾロ目おめでとうございます！\nあなたは特別な番号の訪問者です🎉`;
+  }
+  return `キリ番おめでとうございます！\nあなたは${n}人目の訪問者です🎉`;
+}
+
+function showKiriban(count) {
+  document.getElementById('kiribanNum').textContent = count.toLocaleString();
+  document.getElementById('kiribanMsg').textContent = getKiribanMsg(count);
+  document.getElementById('kiribanPopup').classList.add('show');
+  document.getElementById('kiribanOverlay').classList.add('show');
+}
+
+function closeKiriban() {
+  document.getElementById('kiribanPopup').classList.remove('show');
+  document.getElementById('kiribanOverlay').classList.remove('show');
+}
+
+function selectSurvey(btn, group, hiddenId) {
+  document.querySelectorAll(`.survey-btn[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(hiddenId).value = btn.dataset.val;
+}
+
+async function submitSurvey() {
+  const type = window._resultType;
+  if (!type) return;
+  const ageGroup = document.getElementById('surveyAgeGroup').value || null;
+  const gender = document.getElementById('surveyGender').value || null;
+  await saveDiagnosis(type.id, ageGroup, gender);
+  document.getElementById('surveyDone').style.display = 'block';
+  document.getElementById('surveyForm').querySelectorAll('button:not(#surveyDone)').forEach(b => b.disabled = true);
+}
+
+function shareToFacebook() {
+  const url = 'https://rolemap.jp';
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+}
+
+function shareToThreads() {
+  const type = window._resultType;
+  if (!type) return;
+  const initial = type.name.substring(0, 2);
+  const text = `私のRoleMapタイプは【${initial}】${type.name}（${type.subtitle}）\n\n人は優劣ではなく、役割でできている。\nあなたのタイプも診断してみて\nrolemap.jp`;
+  const url = `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function shareToX() {
+  const type = window._resultType;
+  if (!type) return;
+  const initial = type.name.substring(0, 2);
+  const text = `私のRoleMapタイプは【${initial}】${type.name}（${type.subtitle}）
+
+人は優劣ではなく、役割でできている。
+あなたのタイプも診断してみて👇
+rolemap.jp
+
+#RoleMap #${type.name}`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function copyShareText() {
+  const type = window._resultType;
+  if (!type) return;
+  const initial = type.name.substring(0, 2);
+  const text = `私のRoleMapタイプは ${initial} ${type.name}（${type.subtitle}）\n\nあなたのタイプも診断してみて → rolemap.jp`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const label = document.getElementById('copyLabel');
+    btn.classList.add('done');
+    label.textContent = 'コピーしました！';
+    setTimeout(() => { btn.classList.remove('done'); label.textContent = 'テキストをコピー'; }, 2000);
+  }).catch(() => {
+    alert('コピーできませんでした。ブラウザの設定をご確認ください。');
+  });
+}
+
+function downloadCard() {
+  const canvas = document.getElementById('shareCanvas');
+  try {
+    const dataURL = canvas.toDataURL('image/png');
+    // iPhoneの場合：新しいタブで画像を開く（長押しでカメラロールに保存可能）
+    const isIOS = /iP(hone|od|ad)/.test(navigator.userAgent);
+    if (isIOS) {
+      const win = window.open();
+      win.document.write(`
+        <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+        <style>body{margin:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
+        img{width:100%;max-width:600px;display:block;}
+        p{color:#fff;font-size:14px;text-align:center;padding:16px;opacity:0.7;}</style></head>
+        <body><img src="${dataURL}"><p>画像を長押しして「写真に追加」で保存できます</p></body></html>
+      `);
+      win.document.close();
+    } else {
+      const link = document.createElement('a');
+      link.download = `rolemap-${window._resultType ? window._resultType.name.toLowerCase() : 'result'}.png`;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch(e) {
+    const win = window.open();
+    win.document.write('<img src="' + canvas.toDataURL() + '">');
+  }
+}
+
+function restart() {
+  answers = new Array(questions.length).fill(null);
+  current = 0;
+  questions.sort(() => Math.random() - 0.5);
+  document.documentElement.style.setProperty('--type-color', 'rgba(100,120,255,0.8)');
+  document.getElementById('orb1').style.background = 'radial-gradient(circle, #2F3A8F, transparent 70%)';
+  try { history.replaceState(null, '', location.pathname); } catch(e) {}
+  showScreen('intro');
+}
+
+// URLパラメータからタイプを直接表示
+(function() {
+  const params = new URLSearchParams(location.search);
+  const typeId = params.get('type');
+  if (!typeId) return;
+  const type = TYPES.find(t => t.id === typeId);
+  if (!type) return;
+
+  document.documentElement.style.setProperty('--type-color', type.color);
+  window._resultType = type;
+  renderPrompts(type);
+  drawCycleMap(type);
+  renderBaton(type);
+  document.getElementById('rInitial').textContent = type.name.substring(0,2);
+  document.getElementById('rAnimal').innerHTML = type.animalImage
+    ? `<img src="${type.animalImage}" style="height:1em;width:1em;object-fit:contain;image-rendering:pixelated;">`
+    : `<span style="font-size:1em;">${type.animal}</span>`;
+  document.getElementById('rAnimalName').textContent = type.animalName || '';
+  document.getElementById('rType').textContent = type.name;
+  document.getElementById('rSubtitle').textContent = type.subtitle;
+  document.querySelector('.result-card').setAttribute('data-animal', type.animalName || '');
+  const formattedDesc = type.desc.replace(/【(.+?)】/g, '<span class="desc-heading">$1</span>');
+  document.getElementById('rDesc').innerHTML = formattedDesc;
+  document.querySelector('.scores-section').style.display = 'none';
+  showScreen('result');
+  drawShareCard(type);
+  const em = document.getElementById('shareEmoji');
+  if (em) em.innerHTML = `<span style="font-size:2em;line-height:1;">${type.animal}</span>`;
+})();
+</script>
+</body>
+</html>
